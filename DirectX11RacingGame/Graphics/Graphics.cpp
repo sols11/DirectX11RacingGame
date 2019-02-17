@@ -23,14 +23,14 @@ void Graphics::RenderFrame()
     this->deviceContext->ClearRenderTargetView(this->renderTargetView.Get(), bgcolor);
     this->deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    this->deviceContext->IASetInputLayout(this->vertexshader.GetInputLayout());
+    this->deviceContext->IASetInputLayout(this->vertexShader.GetInputLayout());
     this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     this->deviceContext->RSSetState(this->rasterizerState.Get());
     this->deviceContext->OMSetDepthStencilState(this->depthStencilState.Get(), 0);
     this->deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
     this->deviceContext->PSSetSamplers(0, 1, this->samplerState.GetAddressOf());
-    this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
-    this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
+    this->deviceContext->VSSetShader(vertexShader.GetShader(), NULL, 0);
+    this->deviceContext->PSSetShader(pixelShader.GetShader(), NULL, 0);
 
     this->swapchain->Present(0, NULL);
 }
@@ -177,10 +177,10 @@ bool Graphics::InitializeShaders()
 
     UINT numElements = ARRAYSIZE(layout);
 
-    if (!vertexshader.Initialize(this->device, shaderFolder + L"VertexShader.cso", layout, numElements))
+    if (!vertexShader.Initialize(this->device, shaderFolder + L"VertexShader.cso", layout, numElements))
         return false;
 
-    if (!pixelshader.Initialize(this->device, shaderFolder + L"PixelShader.cso"))
+    if (!pixelShader.Initialize(this->device, shaderFolder + L"PixelShader.cso"))
         return false;
 
     return true;

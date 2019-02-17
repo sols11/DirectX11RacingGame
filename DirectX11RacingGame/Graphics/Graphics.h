@@ -30,10 +30,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
-    VertexShader vertexshader;
-    PixelShader pixelshader;
-    ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
-    ConstantBuffer<CB_PS_pixelshader> cb_ps_pixelshader;
+    VertexShader vertexShader;
+    PixelShader pixelShader;
+    ConstantBuffer<CB_VS_VertexShader> cb_vs_vertexshader;
+    ConstantBuffer<CB_PS_PixelShader> cb_ps_pixelshader;
 
     int windowWidth = 0;
     int windowHeight = 0;

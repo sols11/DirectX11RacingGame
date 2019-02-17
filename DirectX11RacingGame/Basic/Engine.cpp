@@ -1,17 +1,19 @@
 #include "Engine.h"
 
-bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
+bool Engine::Initialize(HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height)
 {
-    if (!this->render_window.Initialize(this, hInstance, window_title, window_class, width, height))
+    if (!this->windowRender.Initialize(this, hInstance, windowTitle, windowClass, width, height))
         return false;
 
-    if (!this->graphics.Initialize(this->render_window.GetHWND(), width, height))
+    if (!this->graphics.Initialize(this->windowRender.GetHWND(), width, height))
         return false;
+
+    return true;
 }
 
 bool Engine::ProcessMessages()
 {
-    return this->render_window.ProcessMessages();
+    return this->windowRender.ProcessMessages();
 }
 
 void Engine::Update()

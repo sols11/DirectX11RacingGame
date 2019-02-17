@@ -1,24 +1,24 @@
 #include "WindowContent.h"
 
 // 初始化并显示窗口
-bool WindowRender::Initialize(WindowContent * pWindowContainer, HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
+bool WindowRender::Initialize(WindowContent * pWindowContainer, HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height)
 {
     this->hInstance = hInstance;
     this->width = width;
     this->height = height;
-    this->window_title = window_title;
-    this->window_title_wide = StringConverter::StringToWide(this->window_title);
-    this->window_class = window_class;
-    this->window_class_wide = StringConverter::StringToWide(this->window_class);
+    this->windowTitle = windowTitle;
+    this->windowTitleWide = StringConverter::StringToWstring(this->windowTitle);
+    this->windowClass = windowClass;
+    this->windowClassWide = StringConverter::StringToWstring(this->windowClass);
 
     this->RegisterWindowClass();
 
-    this->handle = CreateWindowEx(0, this->window_class_wide.c_str(), this->window_title_wide.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 
+    this->handle = CreateWindowEx(0, this->windowClassWide.c_str(), this->windowTitleWide.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 
         0, 0, this->width, this->height, NULL, NULL, this->hInstance, pWindowContainer);
 
     if (this->handle == NULL)
     {
-        ErrorLogger::Log(GetLastError(), "CreateWindowEX Failed for window: " + this->window_title);
+        ErrorLogger::Log(GetLastError(), "CreateWindowEX Failed for window: " + this->windowTitle);
         return false;
     }
 
@@ -48,7 +48,7 @@ bool WindowRender::ProcessMessages()
         if (!IsWindow(this->handle))
         {
             this->handle = NULL;
-            UnregisterClass(this->window_class_wide.c_str(), this->hInstance);
+            UnregisterClass(this->windowClassWide.c_str(), this->hInstance);
             return false;
         }
     }
@@ -65,7 +65,7 @@ WindowRender::~WindowRender()
 {
     if (this->handle != NULL)
     {
-        UnregisterClass(this->window_class_wide.c_str(), this->hInstance);
+        UnregisterClass(this->windowClassWide.c_str(), this->hInstance);
         DestroyWindow(handle);
     }
 }
@@ -124,7 +124,7 @@ void WindowRender::RegisterWindowClass()
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = NULL;
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = this->window_class_wide.c_str();
+    wc.lpszClassName = this->windowClassWide.c_str();
     wc.cbSize = sizeof(WNDCLASSEX);
     RegisterClassEx(&wc);
 }
