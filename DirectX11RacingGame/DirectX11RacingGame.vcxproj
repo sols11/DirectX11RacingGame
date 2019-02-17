@@ -155,15 +155,20 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Basic\COMException.h" />
     <ClInclude Include="Basic\Engine.h" />
     <ClInclude Include="Basic\ErrorLogger.h" />
     <ClInclude Include="Basic\StringConverter.h" />
     <ClInclude Include="Basic\WindowRender.h" />
     <ClInclude Include="Basic\WindowContent.h" />
     <ClInclude Include="Graphics\Adapter.h" />
+    <ClInclude Include="Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Graphics\ConstantBufferType.h" />
     <ClInclude Include="Graphics\Graphics.h" />
+    <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\Vertex.h" />
+    <ClInclude Include="Graphics\VertexBuffer.h" />
     <ClInclude Include="Input\Keyboard.h" />
     <ClInclude Include="Input\KeyboardEvent.h" />
   </ItemGroup>
