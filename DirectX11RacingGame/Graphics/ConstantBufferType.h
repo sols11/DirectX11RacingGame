@@ -1,15 +1,15 @@
 #pragma once
 #include <DirectXMath.h>
 
+//struct CB_VS_VertexShader
+//{
+//	DirectX::XMMATRIX wvpMatrix;
+//	DirectX::XMMATRIX worldMatrix;
+//};
+
 struct CB_VS_VertexShader
 {
-	DirectX::XMMATRIX wvpMatrix;
-	DirectX::XMMATRIX worldMatrix;
-};
-
-struct CB_VS_Matrix
-{
-    DirectX::XMMATRIX mat;
+    DirectX::XMMATRIX matrix;
 };
 
 struct CB_PS_light

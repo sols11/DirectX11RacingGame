@@ -6,12 +6,23 @@
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
+#include "Camera.h"
+#include "..\Basic\Timer.h"
+#include "Model.h"
+#include "HandDrawObject.h"
+#include "Skybox.h"
 
 class Graphics
 {
 public:
     bool Initialize(HWND hwnd, int width, int height);
     void RenderFrame();
+    Camera camera;
+    Model model;
+    HandDrawObject object;
+    HandDrawObject plane;
+    Skybox skybox;
+
 private:
     bool InitializeDirectX(HWND hwnd);
     bool InitializeShaders();
@@ -30,11 +41,20 @@ private:
     Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
-    VertexShader vertexShader;
-    PixelShader pixelShader;
+    VertexShader vertexshader;
+    PixelShader pixelshader;
     ConstantBuffer<CB_VS_VertexShader> cb_vs_vertexshader;
     ConstantBuffer<CB_PS_PixelShader> cb_ps_pixelshader;
 
+    std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
+    std::unique_ptr<DirectX::SpriteFont> spriteFont;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> skyTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
+
     int windowWidth = 0;
     int windowHeight = 0;
+    Timer fpsTimer;
 };

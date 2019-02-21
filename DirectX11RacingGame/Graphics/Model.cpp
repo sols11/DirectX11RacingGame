@@ -32,8 +32,8 @@ void Model::SetTexture(ID3D11ShaderResourceView * texture)
 void Model::Draw(const XMMATRIX & viewProjectionMatrix)
 {
     //Update Constant buffer with WVP Matrix
-    this->cb_vs_vertexshader->data.wvpMatrix = this->worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
-    this->cb_vs_vertexshader->data.wvpMatrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.wvpMatrix);
+    this->cb_vs_vertexshader->data.matrix = this->worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
+    this->cb_vs_vertexshader->data.matrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.matrix);
     this->cb_vs_vertexshader->ApplyChanges();
     this->deviceContext->VSSetConstantBuffers(0, 1, this->cb_vs_vertexshader->GetAddressOf());
 

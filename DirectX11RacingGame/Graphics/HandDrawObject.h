@@ -9,7 +9,7 @@ using namespace DirectX;
 class HandDrawObject
 {
 public:
-    bool Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
+    bool Initialize(Vertex* v, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
     void SetTexture(ID3D11ShaderResourceView * texture);
     void Draw(const XMMATRIX & viewProjectionMatrix);
 
@@ -35,6 +35,12 @@ public:
     const XMVECTOR & GetRightVector();
     const XMVECTOR & GetBackwardVector();
     const XMVECTOR & GetLeftVector();
+    const XMVECTOR & GetUpVector();
+    const XMVECTOR & GetDownVector();
+    void XM_CALLCONV SetWorldMatrix(XMMATRIX world)
+    {
+        worldMatrix = world;
+    }
 private:
     void UpdateWorldMatrix();
 
@@ -54,13 +60,16 @@ private:
     XMFLOAT3 rot;
 
     const XMVECTOR DEFAULT_FORWARD_VECTOR = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-    const XMVECTOR DEFAULT_UP_VECTOR = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
     const XMVECTOR DEFAULT_BACKWARD_VECTOR = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-    const XMVECTOR DEFAULT_LEFT_VECTOR = XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f);
-    const XMVECTOR DEFAULT_RIGHT_VECTOR = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+    const XMVECTOR DEFAULT_UP_VECTOR = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    const XMVECTOR DEFAULT_DOWN_VECTOR = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+    const XMVECTOR DEFAULT_LEFT_VECTOR =    XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f);
+    const XMVECTOR DEFAULT_RIGHT_VECTOR =   XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
     XMVECTOR vec_forward;
     XMVECTOR vec_left;
     XMVECTOR vec_right;
     XMVECTOR vec_backward;
+    XMVECTOR vec_up;
+    XMVECTOR vec_down;
 };

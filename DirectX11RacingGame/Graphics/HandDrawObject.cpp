@@ -1,6 +1,6 @@
 #include "HandDrawObject.h"
 
-bool HandDrawObject::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
+bool HandDrawObject::Initialize(Vertex* v, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
 {
     this->device = device;
     this->deviceContext = deviceContext;
@@ -10,40 +10,40 @@ bool HandDrawObject::Initialize(ID3D11Device * device, ID3D11DeviceContext * dev
     try
     {
         //Textured Square
-        Vertex v[] =
-        {
-            Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f), //FRONT Bottom Left   - [0]
-            Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f), //FRONT Top Left      - [1]
-            Vertex(0.5f,    0.5f, -0.5f, 1.0f, 0.0f), //FRONT Top Right     - [2]
-            Vertex(0.5f,   -0.5f, -0.5f, 1.0f, 1.0f), //FRONT Bottom Right  - [3]
-            Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f), //BACK Bottom Left     - [4]
-            Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f), //BACK Top Left        - [5]
-            Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
-            Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
-        };
+        //Vertex v[] =
+        //{
+        //    Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f), //FRONT Bottom Left   - [0]
+        //    Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f), //FRONT Top Left      - [1]
+        //    Vertex(0.5f,    0.5f, -0.5f, 1.0f, 0.0f), //FRONT Top Right     - [2]
+        //    Vertex(0.5f,   -0.5f, -0.5f, 1.0f, 1.0f), //FRONT Bottom Right  - [3]
+        //    Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f), //BACK Bottom Left     - [4]
+        //    Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f), //BACK Top Left        - [5]
+        //    Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
+        //    Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
+        //};
 
         //Load Vertex Data
-        HRESULT hr = this->vertexBuffer.Initialize(this->device, v, ARRAYSIZE(v));
+        HRESULT hr = this->vertexBuffer.Initialize(this->device, v, vertexNum);
         COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer.");
 
-        DWORD indices[] =
-        {
-            0, 1, 2, //FRONT
-            0, 2, 3, //FRONT
-            4, 7, 6, //BACK 
-            4, 6, 5, //BACK
-            3, 2, 6, //RIGHT SIDE
-            3, 6, 7, //RIGHT SIDE
-            4, 5, 1, //LEFT SIDE
-            4, 1, 0, //LEFT SIDE
-            1, 5, 6, //TOP
-            1, 6, 2, //TOP
-            0, 3, 7, //BOTTOM
-            0, 7, 4, //BOTTOM
-        };
+        //DWORD indices[] =
+        //{
+        //    0, 1, 2, //FRONT
+        //    0, 2, 3, //FRONT
+        //    4, 7, 6, //BACK 
+        //    4, 6, 5, //BACK
+        //    3, 2, 6, //RIGHT SIDE
+        //    3, 6, 7, //RIGHT SIDE
+        //    4, 5, 1, //LEFT SIDE
+        //    4, 1, 0, //LEFT SIDE
+        //    1, 5, 6, //TOP
+        //    1, 6, 2, //TOP
+        //    0, 3, 7, //BOTTOM
+        //    0, 7, 4, //BOTTOM
+        //};
 
         //Load Index Data
-        hr = this->indexBuffer.Initialize(this->device, indices, ARRAYSIZE(indices));
+        hr = this->indexBuffer.Initialize(this->device, indices, indexNum);
         COM_ERROR_IF_FAILED(hr, "Failed to initialize index buffer.");
     }
     catch (COMException & exception)
@@ -66,8 +66,8 @@ void HandDrawObject::SetTexture(ID3D11ShaderResourceView * texture)
 void HandDrawObject::Draw(const XMMATRIX & viewProjectionMatrix)
 {
     //Update Constant buffer with WVP Matrix
-    this->cb_vs_vertexshader->data.wvpMatrix = this->worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
-    this->cb_vs_vertexshader->data.wvpMatrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.wvpMatrix);
+    this->cb_vs_vertexshader->data.matrix = this->worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
+    this->cb_vs_vertexshader->data.matrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.matrix);
     this->cb_vs_vertexshader->ApplyChanges();
     this->deviceContext->VSSetConstantBuffers(0, 1, this->cb_vs_vertexshader->GetAddressOf());
 
@@ -86,6 +86,8 @@ void HandDrawObject::UpdateWorldMatrix()
     this->vec_backward = XMVector3TransformCoord(this->DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
     this->vec_left = XMVector3TransformCoord(this->DEFAULT_LEFT_VECTOR, vecRotationMatrix);
     this->vec_right = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+    this->vec_up = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, vecRotationMatrix);
+    this->vec_down = XMVector3TransformCoord(this->DEFAULT_DOWN_VECTOR, vecRotationMatrix);
 }
 
 const XMVECTOR & HandDrawObject::GetPositionVector() const
@@ -246,4 +248,14 @@ const XMVECTOR & HandDrawObject::GetBackwardVector()
 const XMVECTOR & HandDrawObject::GetLeftVector()
 {
     return this->vec_left;
+}
+
+const XMVECTOR & HandDrawObject::GetUpVector()
+{
+    return this->vec_up;
+}
+
+const XMVECTOR & HandDrawObject::GetDownVector()
+{
+    return this->vec_down;
 }

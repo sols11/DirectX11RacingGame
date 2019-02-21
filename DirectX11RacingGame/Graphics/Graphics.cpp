@@ -4,6 +4,7 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 {
     this->windowWidth = width;
     this->windowHeight = height;
+    this->fpsTimer.Start();
 
     if (!InitializeDirectX(hwnd))
         return false;
@@ -15,24 +16,6 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
         return false;
 
     return true;
-}
-
-void Graphics::RenderFrame()
-{
-    float bgcolor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    this->deviceContext->ClearRenderTargetView(this->renderTargetView.Get(), bgcolor);
-    this->deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-    this->deviceContext->IASetInputLayout(this->vertexShader.GetInputLayout());
-    this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    this->deviceContext->RSSetState(this->rasterizerState.Get());
-    this->deviceContext->OMSetDepthStencilState(this->depthStencilState.Get(), 0);
-    this->deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
-    this->deviceContext->PSSetSamplers(0, 1, this->samplerState.GetAddressOf());
-    this->deviceContext->VSSetShader(vertexShader.GetShader(), NULL, 0);
-    this->deviceContext->PSSetShader(pixelShader.GetShader(), NULL, 0);
-
-    this->swapchain->Present(0, NULL);
 }
 
 bool Graphics::InitializeDirectX(HWND hwnd)
@@ -68,8 +51,18 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
         HRESULT hr;
-        hr = D3D11CreateDeviceAndSwapChain(adapters[0].pAdapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, NULL, NULL, 0, D3D11_SDK_VERSION,
-            &scd, this->swapchain.GetAddressOf(), this->device.GetAddressOf(), NULL, this->deviceContext.GetAddressOf());
+        hr = D3D11CreateDeviceAndSwapChain(adapters[0].pAdapter, //IDXGI Adapter
+            D3D_DRIVER_TYPE_UNKNOWN,
+            NULL, //FOR SOFTWARE DRIVER TYPE
+            NULL, //FLAGS FOR RUNTIME LAYERS
+            NULL, //FEATURE LEVELS ARRAY
+            0, //# OF FEATURE LEVELS IN ARRAY
+            D3D11_SDK_VERSION,
+            &scd, //Swapchain description
+            this->swapchain.GetAddressOf(), //Swapchain Address
+            this->device.GetAddressOf(), //Device Address
+            NULL, //Supported feature level
+            this->deviceContext.GetAddressOf()); //Device Context Address
 
         COM_ERROR_IF_FAILED(hr, "Failed to create device and swapchain.");
 
@@ -80,7 +73,7 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         hr = this->device->CreateRenderTargetView(backBuffer.Get(), NULL, this->renderTargetView.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create render target view.");
 
-        // Éî¶ÈÄ£°å»º´æ
+        //Describe our Depth/Stencil Buffer
         CD3D11_TEXTURE2D_DESC depthStencilTextureDesc(DXGI_FORMAT_D24_UNORM_S8_UINT, this->windowWidth, this->windowHeight);
         depthStencilTextureDesc.MipLevels = 1;
         depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -95,6 +88,8 @@ bool Graphics::InitializeDirectX(HWND hwnd)
 
         //Create depth stencil state
         CD3D11_DEPTH_STENCIL_DESC depthstencildesc(D3D11_DEFAULT);
+        depthstencildesc.DepthEnable = true;
+        depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
         depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
 
         hr = this->device->CreateDepthStencilState(&depthstencildesc, this->depthStencilState.GetAddressOf());
@@ -132,6 +127,9 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         hr = this->device->CreateBlendState(&blendDesc, this->blendState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create blend state.");
 
+        spriteBatch = std::make_unique<DirectX::SpriteBatch>(this->deviceContext.Get());
+        spriteFont = std::make_unique<DirectX::SpriteFont>(this->device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
+
         //Create sampler description for sampler state
         CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
         sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -150,13 +148,14 @@ bool Graphics::InitializeDirectX(HWND hwnd)
 
 bool Graphics::InitializeShaders()
 {
-    std::wstring shaderFolder = L"";
+
+    std::wstring shaderfolder = L"";
 #pragma region DetermineShaderPath
     if (IsDebuggerPresent() == TRUE)
     {
 #ifdef _DEBUG //Debug Mode
 #ifdef _WIN64 //x64
-        shaderFolder = L"..\\x64\\Debug\\";
+        shaderfolder = L"..\\x64\\Debug\\";
 #else  //x86 (Win32)
         shaderfolder = L"..\\Debug\\";
 #endif
@@ -171,16 +170,16 @@ bool Graphics::InitializeShaders()
 
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
         {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
     };
 
     UINT numElements = ARRAYSIZE(layout);
 
-    if (!vertexShader.Initialize(this->device, shaderFolder + L"VertexShader.cso", layout, numElements))
+    if (!vertexshader.Initialize(this->device, shaderfolder + L"vertexshader.cso", layout, numElements))
         return false;
 
-    if (!pixelShader.Initialize(this->device, shaderFolder + L"PixelShader.cso"))
+    if (!pixelshader.Initialize(this->device, shaderfolder + L"pixelshader.cso"))
         return false;
 
     return true;
@@ -190,18 +189,131 @@ bool Graphics::InitializeScene()
 {
     try
     {
+        //Load Texture
+        HRESULT hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\daylight.jpg", nullptr, skyTexture.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create dds texture from file.");
+
+        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
+
+        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
+
+        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
+
         //Initialize Constant Buffer(s)
-        HRESULT hr;
         hr = this->cb_vs_vertexshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
+
+        //skybox.SetTexture(this->skyTexture.Get(), 0);
+        skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000);
+
+        if (!model.Initialize("Data\\Objects\\light.fbx", this->device.Get(), this->deviceContext.Get(), this->grassTexture.Get(), this->cb_vs_vertexshader))
+            return false;
+
+        Vertex vertexs[] =
+        {
+            Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f), //FRONT Bottom Left   - [0]
+            Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f), //FRONT Top Left      - [1]
+            Vertex(0.5f,    0.5f, -0.5f, 1.0f, 0.0f), //FRONT Top Right     - [2]
+            Vertex(0.5f,   -0.5f, -0.5f, 1.0f, 1.0f), //FRONT Bottom Right  - [3]
+            Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f), //BACK Bottom Left     - [4]
+            Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f), //BACK Top Left        - [5]
+            Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
+            Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
+        };
+        DWORD indices[] =
+        {
+            0, 1, 2, //FRONT
+            0, 2, 3, //FRONT
+            4, 7, 6, //BACK 
+            4, 6, 5, //BACK
+            3, 2, 6, //RIGHT SIDE
+            3, 6, 7, //RIGHT SIDE
+            4, 5, 1, //LEFT SIDE
+            4, 1, 0, //LEFT SIDE
+            1, 5, 6, //TOP
+            1, 6, 2, //TOP
+            0, 3, 7, //BOTTOM
+            0, 7, 4, //BOTTOM
+        };
+
+        if (!object.Initialize(vertexs, indices, ARRAYSIZE(vertexs), ARRAYSIZE(indices), this->device.Get(), this->deviceContext.Get(), this->pinkTexture.Get(), this->cb_vs_vertexshader))
+            return false;
+
+        Vertex planeVertexs[] =
+        {
+            Vertex(-10, 0, -10, 0, 0),
+            Vertex(-10, 0,  10, 0, 1),
+            Vertex(10, 0, -10, 1, 0),
+            Vertex(10, 0,  10, 1, 1),
+        };
+        DWORD planeIndices[] =
+        {
+            0,1,2,
+            1,3,2,
+        };
+
+        if (!plane.Initialize(planeVertexs, planeIndices, ARRAYSIZE(planeVertexs), ARRAYSIZE(planeIndices), this->device.Get(), this->deviceContext.Get(), this->pavementTexture.Get(), this->cb_vs_vertexshader))
+            return false;
+
+        model.SetPosition(0, 5, 0);
+        plane.SetPosition(0, -0.5f, 0);
+        camera.SetPosition(0.0f, 2.0f, -4.0f);
+        //XMFLOAT3 originPoint(0, 0, 0);
+        camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
     }
-    catch (COMException& exception)
+    catch (COMException & exception)
     {
         ErrorLogger::Log(exception);
         return false;
     }
     return true;
 }
+
+void Graphics::RenderFrame()
+{
+    float bgcolor[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+    this->deviceContext->ClearRenderTargetView(this->renderTargetView.Get(), bgcolor);
+    this->deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+    this->deviceContext->IASetInputLayout(this->vertexshader.GetInputLayout());
+    this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    this->deviceContext->RSSetState(this->rasterizerState.Get());
+    this->deviceContext->OMSetDepthStencilState(this->depthStencilState.Get(), 0);
+    this->deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
+    this->deviceContext->PSSetSamplers(0, 1, this->samplerState.GetAddressOf());
+    this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
+    this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
+
+    {
+        this->model.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
+        this->object.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
+        this->plane.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
+        this->skybox.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
+        camera.SetLookAtPos(object.GetPositionFloat3());
+    }
+
+    //Draw Text
+    static int fpsCounter = 0;
+    static std::string fpsString = "FPS: 0";
+    fpsCounter += 1;
+    if (fpsTimer.GetMilisecondsElapsed() > 1000.0)
+    {
+        fpsString = "FPS: " + std::to_string(fpsCounter);
+        fpsCounter = 0;
+        fpsTimer.Restart();
+    }
+    spriteBatch->Begin();
+    spriteFont->DrawString(spriteBatch.get(), StringConverter::StringToWstring(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteBatch->End();
+
+    static int counter = 0;
+
+    this->swapchain->Present(0, NULL);
+}
+
