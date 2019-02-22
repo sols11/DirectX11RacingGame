@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "Geometry.h"
 
 bool Graphics::Initialize(HWND hwnd, int width, int height)
 {
@@ -51,18 +52,8 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
         HRESULT hr;
-        hr = D3D11CreateDeviceAndSwapChain(adapters[0].pAdapter, //IDXGI Adapter
-            D3D_DRIVER_TYPE_UNKNOWN,
-            NULL, //FOR SOFTWARE DRIVER TYPE
-            NULL, //FLAGS FOR RUNTIME LAYERS
-            NULL, //FEATURE LEVELS ARRAY
-            0, //# OF FEATURE LEVELS IN ARRAY
-            D3D11_SDK_VERSION,
-            &scd, //Swapchain description
-            this->swapchain.GetAddressOf(), //Swapchain Address
-            this->device.GetAddressOf(), //Device Address
-            NULL, //Supported feature level
-            this->deviceContext.GetAddressOf()); //Device Context Address
+        hr = D3D11CreateDeviceAndSwapChain(adapters[0].pAdapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, NULL, NULL, 0, D3D11_SDK_VERSION,
+            &scd, this->swapchain.GetAddressOf(), this->device.GetAddressOf(), NULL, this->deviceContext.GetAddressOf());
 
         COM_ERROR_IF_FAILED(hr, "Failed to create device and swapchain.");
 
@@ -209,6 +200,7 @@ bool Graphics::InitializeScene()
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
+        auto meshData = Geometry::CreateCylinder();
         //skybox.SetTexture(this->skyTexture.Get(), 0);
         skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000);
 
@@ -226,6 +218,7 @@ bool Graphics::InitializeScene()
             Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
             Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
         };
+
         DWORD indices[] =
         {
             0, 1, 2, //FRONT

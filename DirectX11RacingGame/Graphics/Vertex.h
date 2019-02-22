@@ -1,4 +1,5 @@
 #pragma once
+//#include <d3d11_1.h>
 #include <DirectXMath.h>
 
 struct Vertex
@@ -9,4 +10,5 @@ struct Vertex
 
 	DirectX::XMFLOAT3 pos;
 	DirectX::XMFLOAT2 texCoord;
+    //static const D3D10_INPUT_ELEMENT_DESC inputLayout[2];
 };

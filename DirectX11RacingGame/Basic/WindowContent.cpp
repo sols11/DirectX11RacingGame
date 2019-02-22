@@ -2,12 +2,12 @@
 
 WindowContent::WindowContent()
 {
-    static bool raw_input_initialized = false;
-    if (raw_input_initialized == false)
+    static bool rawInputInitialized = false;
+    if (rawInputInitialized == false)
     {
         RAWINPUTDEVICE rid;
-
-        rid.usUsagePage = 0x01; //Mouse
+        
+        rid.usUsagePage = 0x01; // Mouse
         rid.usUsage = 0x02;
         rid.dwFlags = 0;
         rid.hwndTarget = NULL;
@@ -18,7 +18,7 @@ WindowContent::WindowContent()
             exit(-1);
         }
 
-        raw_input_initialized = true;
+        rawInputInitialized = true;
     }
 }
 

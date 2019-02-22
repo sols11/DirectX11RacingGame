@@ -152,6 +152,7 @@
     <ClCompile Include="Basic\WindowRender.cpp" />
     <ClCompile Include="Graphics\Adapter.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\Car.cpp" />
     <ClCompile Include="Graphics\Graphics.cpp" />
     <ClCompile Include="Graphics\HandDrawObject.cpp" />
     <ClCompile Include="Graphics\Mesh.cpp" />
@@ -174,8 +175,10 @@
     <ClInclude Include="Basic\WindowContent.h" />
     <ClInclude Include="Graphics\Adapter.h" />
     <ClInclude Include="Graphics\Camera.h" />
+    <ClInclude Include="Graphics\Car.h" />
     <ClInclude Include="Graphics\ConstantBuffer.h" />
     <ClInclude Include="Graphics\ConstantBufferType.h" />
+    <ClInclude Include="Graphics\Geometry.h" />
     <ClInclude Include="Graphics\Graphics.h" />
     <ClInclude Include="Graphics\HandDrawObject.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
