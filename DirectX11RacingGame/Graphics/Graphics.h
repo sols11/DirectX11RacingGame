@@ -11,6 +11,7 @@
 #include "Model.h"
 #include "HandDrawObject.h"
 #include "Skybox.h"
+#include "Car.h"
 
 class Graphics
 {
@@ -22,6 +23,7 @@ public:
     HandDrawObject object;
     HandDrawObject plane;
     Skybox skybox;
+    Car car;
 
 private:
     bool InitializeDirectX(HWND hwnd);

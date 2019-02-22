@@ -4,7 +4,7 @@
 #include <wrl/client.h>
 #include <memory>
 
-template<class T>
+template<class T = Vertex>
 class VertexBuffer
 {
 private:
@@ -55,7 +55,7 @@ public:
 		return this->stride.get();
 	}
 
-	HRESULT Initialize(ID3D11Device *device, T * data, UINT numVertices)
+	HRESULT Initialize(ID3D11Device *device, T* data, UINT numVertices)
 	{
 		if (buffer.Get() != nullptr)
 			buffer.Reset();

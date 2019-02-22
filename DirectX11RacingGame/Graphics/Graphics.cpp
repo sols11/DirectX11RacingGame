@@ -200,9 +200,10 @@ bool Graphics::InitializeScene()
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
-        auto meshData = Geometry::CreateCylinder();
         //skybox.SetTexture(this->skyTexture.Get(), 0);
         skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000);
+
+        car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader);
 
         if (!model.Initialize("Data\\Objects\\light.fbx", this->device.Get(), this->deviceContext.Get(), this->grassTexture.Get(), this->cb_vs_vertexshader))
             return false;
@@ -284,11 +285,14 @@ void Graphics::RenderFrame()
     this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
 
     {
-        this->model.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
-        this->object.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
-        this->plane.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
-        this->skybox.Draw(camera.GetViewMatrix() * camera.GetProjectionMatrix());
-        camera.SetLookAtPos(object.GetPositionFloat3());
+        XMMATRIX matrix = camera.GetViewMatrix() * camera.GetProjectionMatrix();
+
+        this->model.Draw(matrix);
+        //this->object.Draw(matrix);
+        this->plane.Draw(matrix);
+        this->skybox.Draw(matrix);
+        this->car.Draw(matrix);
+        // 第三人称锁定 camera.SetLookAtPos(object.GetPositionFloat3());
     }
 
     //Draw Text
