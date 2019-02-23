@@ -3,15 +3,17 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include <vector>
 
 using namespace DirectX;
 
 class HandDrawObject
 {
 public:
+    bool Initialize(std::vector<Vertex>& vertexVector, std::vector<DWORD>& indexVector, ID3D11Device* device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
     bool Initialize(Vertex* v, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
     void SetTexture(ID3D11ShaderResourceView * texture);
-    void Draw(const XMMATRIX & viewProjectionMatrix);
+    void virtual Draw(const XMMATRIX & viewProjectionMatrix);
 
     const XMVECTOR & GetPositionVector() const;
     const XMFLOAT3 & GetPositionFloat3() const;
@@ -41,8 +43,10 @@ public:
     {
         worldMatrix = world;
     }
-private:
-    void UpdateWorldMatrix();
+
+    void UpdateWorldMatrix(XMMATRIX& parentMatrix);
+protected:
+    void virtual UpdateWorldMatrix();
 
     ID3D11Device * device = nullptr;
     ID3D11DeviceContext * deviceContext = nullptr;

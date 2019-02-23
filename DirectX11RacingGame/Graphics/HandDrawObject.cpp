@@ -1,5 +1,10 @@
 #include "HandDrawObject.h"
 
+bool HandDrawObject::Initialize(std::vector<Vertex>& vertexVector, std::vector<DWORD>& indexVector, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
+{
+    return this->Initialize(vertexVector.data(), indexVector.data(), vertexVector.size(), indexVector.size(), device, deviceContext, texture, cb_vs_vertexshader);
+}
+
 bool HandDrawObject::Initialize(Vertex* v, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
 {
     this->device = device;
@@ -9,38 +14,9 @@ bool HandDrawObject::Initialize(Vertex* v, DWORD* indices, UINT vertexNum, UINT 
 
     try
     {
-        //Textured Square
-        //Vertex v[] =
-        //{
-        //    Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f), //FRONT Bottom Left   - [0]
-        //    Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f), //FRONT Top Left      - [1]
-        //    Vertex(0.5f,    0.5f, -0.5f, 1.0f, 0.0f), //FRONT Top Right     - [2]
-        //    Vertex(0.5f,   -0.5f, -0.5f, 1.0f, 1.0f), //FRONT Bottom Right  - [3]
-        //    Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f), //BACK Bottom Left     - [4]
-        //    Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f), //BACK Top Left        - [5]
-        //    Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
-        //    Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
-        //};
-
         //Load Vertex Data
         HRESULT hr = this->vertexBuffer.Initialize(this->device, v, vertexNum);
         COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer.");
-
-        //DWORD indices[] =
-        //{
-        //    0, 1, 2, //FRONT
-        //    0, 2, 3, //FRONT
-        //    4, 7, 6, //BACK 
-        //    4, 6, 5, //BACK
-        //    3, 2, 6, //RIGHT SIDE
-        //    3, 6, 7, //RIGHT SIDE
-        //    4, 5, 1, //LEFT SIDE
-        //    4, 1, 0, //LEFT SIDE
-        //    1, 5, 6, //TOP
-        //    1, 6, 2, //TOP
-        //    0, 3, 7, //BOTTOM
-        //    0, 7, 4, //BOTTOM
-        //};
 
         //Load Index Data
         hr = this->indexBuffer.Initialize(this->device, indices, indexNum);
@@ -88,6 +64,12 @@ void HandDrawObject::UpdateWorldMatrix()
     this->vec_right = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
     this->vec_up = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, vecRotationMatrix);
     this->vec_down = XMVector3TransformCoord(this->DEFAULT_DOWN_VECTOR, vecRotationMatrix);
+}
+
+void HandDrawObject::UpdateWorldMatrix(XMMATRIX & parentMatrix)
+{
+    UpdateWorldMatrix();
+    this->worldMatrix = this->worldMatrix * parentMatrix;
 }
 
 const XMVECTOR & HandDrawObject::GetPositionVector() const

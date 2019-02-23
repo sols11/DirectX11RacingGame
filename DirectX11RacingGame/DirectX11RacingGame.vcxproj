@@ -149,7 +149,6 @@
     <ClCompile Include="Basic\StringConverter.cpp" />
     <ClCompile Include="Basic\Timer.cpp" />
     <ClCompile Include="Basic\WindowContent.cpp" />
-    <ClCompile Include="Basic\WindowRender.cpp" />
     <ClCompile Include="Graphics\Adapter.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\Car.cpp" />
@@ -171,7 +170,6 @@
     <ClInclude Include="Basic\ErrorLogger.h" />
     <ClInclude Include="Basic\StringConverter.h" />
     <ClInclude Include="Basic\Timer.h" />
-    <ClInclude Include="Basic\WindowRender.h" />
     <ClInclude Include="Basic\WindowContent.h" />
     <ClInclude Include="Graphics\Adapter.h" />
     <ClInclude Include="Graphics\Camera.h" />

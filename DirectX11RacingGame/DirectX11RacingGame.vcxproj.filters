@@ -39,9 +39,6 @@
     <ClCompile Include="Basic\WindowContent.cpp">
       <Filter>Source Files\Basic</Filter>
     </ClCompile>
-    <ClCompile Include="Basic\WindowRender.cpp">
-      <Filter>Source Files\Basic</Filter>
-    </ClCompile>
     <ClCompile Include="Basic\ErrorLogger.cpp">
       <Filter>Source Files\Basic</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basic\WindowContent.h">
-      <Filter>Header Files\Basic</Filter>
-    </ClInclude>
-    <ClInclude Include="Basic\WindowRender.h">
       <Filter>Header Files\Basic</Filter>
     </ClInclude>
     <ClInclude Include="Basic\ErrorLogger.h">

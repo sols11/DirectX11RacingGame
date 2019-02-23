@@ -4,18 +4,13 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string windowTitle, std::strin
 {
     timer.Start();
 
-    if (!this->windowRender.Initialize(this, hInstance, windowTitle, windowClass, width, height))
+    if (!WindowContent::Initialize(this, hInstance, windowTitle, windowClass, width, height))
         return false;
 
-    if (!this->graphics.Initialize(this->windowRender.GetHWND(), width, height))
+    if (!this->graphics.Initialize(this->WindowContent::GetHWND(), width, height))
         return false;
 
     return true;
-}
-
-bool Engine::ProcessMessages()
-{
-    return this->windowRender.ProcessMessages();
 }
 
 void Engine::Update()
@@ -62,27 +57,25 @@ void Engine::Update()
         }
     }
 
-    //this->graphics.model.AdjustRotation(0.0f, 0.001f*dt, 0.0f);
-
     const float cameraSpeed = 0.006f;
     float objectSpeed = 0.003f;
     float objectRotSpeed = 0.003f;
 
     if (keyboard.KeyIsPressed('&'))
     {
-        this->graphics.object.AdjustPosition(this->graphics.object.GetForwardVector() * objectSpeed * dt);
+        this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * objectSpeed * dt);
     }
     if (keyboard.KeyIsPressed('('))
     {
-        this->graphics.object.AdjustPosition(this->graphics.object.GetBackwardVector() * objectSpeed * dt);
+        this->graphics.car.AdjustPosition(this->graphics.car.GetBackwardVector() * objectSpeed * dt);
     }
     if (keyboard.KeyIsPressed('%'))
     {
-        this->graphics.object.AdjustRotation(this->graphics.object.GetDownVector() * objectRotSpeed * dt);
+        this->graphics.car.AdjustRotation(this->graphics.car.GetDownVector() * objectRotSpeed * dt);
     }
     if (keyboard.KeyIsPressed('\''))
     {
-        this->graphics.object.AdjustRotation(this->graphics.object.GetUpVector() * objectRotSpeed * dt);
+        this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * objectRotSpeed * dt);
     }
 
     if (keyboard.KeyIsPressed('W'))

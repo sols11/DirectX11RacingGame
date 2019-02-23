@@ -20,7 +20,6 @@ public:
     void RenderFrame();
     Camera camera;
     Model model;
-    HandDrawObject object;
     HandDrawObject plane;
     Skybox skybox;
     Car car;

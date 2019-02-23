@@ -200,43 +200,11 @@ bool Graphics::InitializeScene()
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
-        //skybox.SetTexture(this->skyTexture.Get(), 0);
         skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000);
 
         car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader);
 
         if (!model.Initialize("Data\\Objects\\light.fbx", this->device.Get(), this->deviceContext.Get(), this->grassTexture.Get(), this->cb_vs_vertexshader))
-            return false;
-
-        Vertex vertexs[] =
-        {
-            Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f), //FRONT Bottom Left   - [0]
-            Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f), //FRONT Top Left      - [1]
-            Vertex(0.5f,    0.5f, -0.5f, 1.0f, 0.0f), //FRONT Top Right     - [2]
-            Vertex(0.5f,   -0.5f, -0.5f, 1.0f, 1.0f), //FRONT Bottom Right  - [3]
-            Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f), //BACK Bottom Left     - [4]
-            Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f), //BACK Top Left        - [5]
-            Vertex(0.5f,    0.5f, 0.5f, 1.0f, 0.0f), //BACK Top Right       - [6]
-            Vertex(0.5f,   -0.5f, 0.5f, 1.0f, 1.0f), //BACK Bottom Right    - [7]
-        };
-
-        DWORD indices[] =
-        {
-            0, 1, 2, //FRONT
-            0, 2, 3, //FRONT
-            4, 7, 6, //BACK 
-            4, 6, 5, //BACK
-            3, 2, 6, //RIGHT SIDE
-            3, 6, 7, //RIGHT SIDE
-            4, 5, 1, //LEFT SIDE
-            4, 1, 0, //LEFT SIDE
-            1, 5, 6, //TOP
-            1, 6, 2, //TOP
-            0, 3, 7, //BOTTOM
-            0, 7, 4, //BOTTOM
-        };
-
-        if (!object.Initialize(vertexs, indices, ARRAYSIZE(vertexs), ARRAYSIZE(indices), this->device.Get(), this->deviceContext.Get(), this->pinkTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
         Vertex planeVertexs[] =
@@ -252,11 +220,11 @@ bool Graphics::InitializeScene()
             1,3,2,
         };
 
-        if (!plane.Initialize(planeVertexs, planeIndices, ARRAYSIZE(planeVertexs), ARRAYSIZE(planeIndices), this->device.Get(), this->deviceContext.Get(), this->pavementTexture.Get(), this->cb_vs_vertexshader))
+        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0,-1.0f,0));
+        if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->pavementTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
         model.SetPosition(0, 5, 0);
-        plane.SetPosition(0, -0.5f, 0);
         camera.SetPosition(0.0f, 2.0f, -4.0f);
         //XMFLOAT3 originPoint(0, 0, 0);
         camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
@@ -288,7 +256,6 @@ void Graphics::RenderFrame()
         XMMATRIX matrix = camera.GetViewMatrix() * camera.GetProjectionMatrix();
 
         this->model.Draw(matrix);
-        //this->object.Draw(matrix);
         this->plane.Draw(matrix);
         this->skybox.Draw(matrix);
         this->car.Draw(matrix);
