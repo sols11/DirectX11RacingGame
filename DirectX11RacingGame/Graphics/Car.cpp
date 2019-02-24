@@ -23,14 +23,16 @@ bool Car::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext,
 void Car::Draw(const XMMATRIX& viewProjectionMatrix)
 {
     Model::Draw(viewProjectionMatrix);
+    wheels[0].Draw(viewProjectionMatrix);
 }
 
-void Car::UpdateWorldMatrix()
+void Car::UpdateWorldMatrix(XMMATRIX parentWorldMatrix)
 {
-    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
+    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z) *parentWorldMatrix;
     XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
     this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
     this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
     this->vecUp = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, vecRotationMatrix);
-    wheels[0].UpdateWorldMatrix();
+
+    wheels[0].UpdateWorldMatrix(this->worldMatrix);
 }

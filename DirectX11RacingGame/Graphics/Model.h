@@ -11,17 +11,8 @@ using namespace DirectX;
 class Model
 {
 public:
-    Model()
-    {
-
-    }
-    Model(Model* parent)
-    {
-        this->parent = parent;
-    }
-
+    // 从预定义的vertex和index加载的模型
     bool Initialize(std::vector<Vertex>& vertexVector, std::vector<DWORD>& indexVector, ID3D11Device* device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
-    bool Initialize(Vertex* vertices, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
     // 从文件中加载的模型
     bool Initialize(const std::string & filePath, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader> & cb_vs_vertexshader);
     void SetTexture(ID3D11ShaderResourceView* texture);
@@ -51,7 +42,7 @@ public:
     const XMVECTOR & GetUpVector();
     const XMMATRIX& GetWorldMatrix();
     void XM_CALLCONV SetWorldMatrix(XMMATRIX world);
-    void virtual UpdateWorldMatrix();
+    void virtual UpdateWorldMatrix(XMMATRIX parentWorldMatrix = XMMatrixIdentity());
 
 protected:
     bool LoadModel(const std::string & filePath);
@@ -81,6 +72,5 @@ protected:
     XMVECTOR vecRight;
     XMVECTOR vecUp;
 
-    Model * parent = nullptr;
     std::vector<Mesh> meshes;
 };

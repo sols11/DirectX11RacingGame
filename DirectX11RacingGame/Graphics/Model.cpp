@@ -2,40 +2,16 @@
 
 bool Model::Initialize(std::vector<Vertex>& vertexVector, std::vector<DWORD>& indexVector, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
 {
-    //this->device = device;
-    //this->deviceContext = deviceContext;
-    //this->texture = texture;
-    //this->cb_vs_vertexshader = &cb_vs_vertexshader;
-    //meshes.push_back(Mesh(this->device, this->deviceContext, vertexVector, indexVector));
-
-    return this->Initialize(vertexVector.data(), indexVector.data(), vertexVector.size(), indexVector.size(), device, deviceContext, texture, cb_vs_vertexshader);
-}
-
-bool Model::Initialize(Vertex* vertices, DWORD* indices, UINT vertexNum, UINT indexNum, ID3D11Device * device, ID3D11DeviceContext * deviceContext, ID3D11ShaderResourceView * texture, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
-{
     this->device = device;
     this->deviceContext = deviceContext;
     this->texture = texture;
     this->cb_vs_vertexshader = &cb_vs_vertexshader;
-
-    // 顶点和索引初始化
-    try
-    {
-        HRESULT hr = this->vertexBuffer.Initialize(this->device, vertices, vertexNum);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer.");
-
-        hr = this->indexBuffer.Initialize(this->device, indices, indexNum);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize index buffer.");
-    }
-    catch (COMException & exception)
-    {
-        ErrorLogger::Log(exception);
-        return false;
-    }
+    meshes.push_back(Mesh(this->device, this->deviceContext, vertexVector, indexVector));
 
     this->SetPosition(0.0f, 0.0f, 0.0f);
     this->SetRotation(0.0f, 0.0f, 0.0f);
     this->UpdateWorldMatrix();
+
     return true;
 }
 
@@ -93,11 +69,9 @@ void Model::Draw(const XMMATRIX & viewProjectionMatrix)
     }
 }
 
-void Model::UpdateWorldMatrix()
+void Model::UpdateWorldMatrix(XMMATRIX parentWorldMatrix)
 {
-    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
-    if(parent != nullptr)
-        this->worldMatrix = this->worldMatrix * parent->GetWorldMatrix();
+    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z) * parentWorldMatrix;
     XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
     this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
     this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
