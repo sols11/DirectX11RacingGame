@@ -66,7 +66,7 @@ public:
 private:
 	struct VertexData
 	{
-		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT4 tangent;
 		DirectX::XMFLOAT4 color;
@@ -86,7 +86,7 @@ private:
 template<class VertexType>
 inline void Geometry::InsertVertexElement(VertexType& vertexDst, const VertexData& vertexSrc)
 {
-    vertexDst.pos = vertexSrc.pos;
+    vertexDst.pos = vertexSrc.position;
     vertexDst.texCoord = vertexSrc.tex;
 
 	//static std::string semanticName;
@@ -136,10 +136,10 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateSphere(float ra
 			y = radius * cosf(phi);
 			z = radius * sinf(phi) * sinf(theta);
 			// 计算出局部坐标、法向量、Tangent向量和纹理坐标
-			XMFLOAT3 pos = XMFLOAT3(x, y, z), normal;
-			XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&pos)));
+			XMFLOAT3 position = XMFLOAT3(x, y, z), normal;
+			XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&position)));
 
-			vertexData = { pos, normal, XMFLOAT4(-sinf(theta), 0.0f, cosf(theta), 1.0f), color, XMFLOAT2(theta / XM_2PI, phi / XM_PI) };
+			vertexData = { position, normal, XMFLOAT4(-sinf(theta), 0.0f, cosf(theta), 1.0f), color, XMFLOAT2(theta / XM_2PI, phi / XM_PI) };
 			InsertVertexElement(meshData.vertexVec[vIndex++], vertexData);
 		}
 	}
@@ -203,35 +203,35 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateBox(float width
 	float w2 = width / 2, h2 = height / 2, d2 = depth / 2;
 
 	// 顶面
-	vertexDataArr[0].pos = XMFLOAT3(-w2, h2, -d2);
-	vertexDataArr[1].pos = XMFLOAT3(-w2, h2, d2);
-	vertexDataArr[2].pos = XMFLOAT3(w2, h2, d2);
-	vertexDataArr[3].pos = XMFLOAT3(w2, h2, -d2);
+	vertexDataArr[0].position = XMFLOAT3(-w2, h2, -d2);
+	vertexDataArr[1].position = XMFLOAT3(-w2, h2, d2);
+	vertexDataArr[2].position = XMFLOAT3(w2, h2, d2);
+	vertexDataArr[3].position = XMFLOAT3(w2, h2, -d2);
 	// 底面
-	vertexDataArr[4].pos = XMFLOAT3(w2, -h2, -d2);
-	vertexDataArr[5].pos = XMFLOAT3(w2, -h2, d2);
-	vertexDataArr[6].pos = XMFLOAT3(-w2, -h2, d2);
-	vertexDataArr[7].pos = XMFLOAT3(-w2, -h2, -d2);
+	vertexDataArr[4].position = XMFLOAT3(w2, -h2, -d2);
+	vertexDataArr[5].position = XMFLOAT3(w2, -h2, d2);
+	vertexDataArr[6].position = XMFLOAT3(-w2, -h2, d2);
+	vertexDataArr[7].position = XMFLOAT3(-w2, -h2, -d2);
 	// 左面
-	vertexDataArr[8].pos = XMFLOAT3(-w2, -h2, d2);
-	vertexDataArr[9].pos = XMFLOAT3(-w2, h2, d2);
-	vertexDataArr[10].pos = XMFLOAT3(-w2, h2, -d2);
-	vertexDataArr[11].pos = XMFLOAT3(-w2, -h2, -d2);
+	vertexDataArr[8].position = XMFLOAT3(-w2, -h2, d2);
+	vertexDataArr[9].position = XMFLOAT3(-w2, h2, d2);
+	vertexDataArr[10].position = XMFLOAT3(-w2, h2, -d2);
+	vertexDataArr[11].position = XMFLOAT3(-w2, -h2, -d2);
 	// 右面
-	vertexDataArr[12].pos = XMFLOAT3(w2, -h2, -d2);
-	vertexDataArr[13].pos = XMFLOAT3(w2, h2, -d2);
-	vertexDataArr[14].pos = XMFLOAT3(w2, h2, d2);
-	vertexDataArr[15].pos = XMFLOAT3(w2, -h2, d2);
+	vertexDataArr[12].position = XMFLOAT3(w2, -h2, -d2);
+	vertexDataArr[13].position = XMFLOAT3(w2, h2, -d2);
+	vertexDataArr[14].position = XMFLOAT3(w2, h2, d2);
+	vertexDataArr[15].position = XMFLOAT3(w2, -h2, d2);
 	// 前面
-	vertexDataArr[16].pos = XMFLOAT3(w2, -h2, d2);
-	vertexDataArr[17].pos = XMFLOAT3(w2, h2, d2);
-	vertexDataArr[18].pos = XMFLOAT3(-w2, h2, d2);
-	vertexDataArr[19].pos = XMFLOAT3(-w2, -h2, d2);
+	vertexDataArr[16].position = XMFLOAT3(w2, -h2, d2);
+	vertexDataArr[17].position = XMFLOAT3(w2, h2, d2);
+	vertexDataArr[18].position = XMFLOAT3(-w2, h2, d2);
+	vertexDataArr[19].position = XMFLOAT3(-w2, -h2, d2);
 	// 后面
-	vertexDataArr[20].pos = XMFLOAT3(-w2, -h2, -d2);
-	vertexDataArr[21].pos = XMFLOAT3(-w2, h2, -d2);
-	vertexDataArr[22].pos = XMFLOAT3(w2, h2, -d2);
-	vertexDataArr[23].pos = XMFLOAT3(w2, -h2, -d2);
+	vertexDataArr[20].position = XMFLOAT3(-w2, -h2, -d2);
+	vertexDataArr[21].position = XMFLOAT3(-w2, h2, -d2);
+	vertexDataArr[22].position = XMFLOAT3(w2, h2, -d2);
+	vertexDataArr[23].position = XMFLOAT3(w2, -h2, -d2);
 
 	for (int i = 0; i < 4; ++i)
 	{

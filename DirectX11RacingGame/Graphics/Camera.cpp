@@ -2,10 +2,10 @@
 
 Camera::Camera()
 {
-	this->pos = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	this->posVector = XMLoadFloat3(&this->pos);
-	this->rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	this->rotVector = XMLoadFloat3(&this->rot);
+	this->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	this->posVector = XMLoadFloat3(&this->position);
+	this->rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	this->rotVector = XMLoadFloat3(&this->rotation);
 	this->UpdateViewMatrix();
 }
 
@@ -30,9 +30,9 @@ const XMVECTOR & Camera::GetPositionVector() const
 	return this->posVector;
 }
 
-const XMFLOAT3 & Camera::GetPositionFloat3() const
+const XMFLOAT3 & Camera::GetPosition() const
 {
-	return this->pos;
+	return this->position;
 }
 
 const XMVECTOR & Camera::GetRotationVector() const
@@ -42,110 +42,110 @@ const XMVECTOR & Camera::GetRotationVector() const
 
 const XMFLOAT3 & Camera::GetRotationFloat3() const
 {
-	return this->rot;
+	return this->rotation;
 }
 
-void Camera::SetPosition(const XMVECTOR & pos)
+void Camera::SetPosition(const XMVECTOR & position)
 {
-	XMStoreFloat3(&this->pos, pos);
-	this->posVector = pos;
+	XMStoreFloat3(&this->position, position);
+	this->posVector = position;
 	this->UpdateViewMatrix();
 }
 
-void Camera::SetPosition(const XMFLOAT3 & pos)
+void Camera::SetPosition(const XMFLOAT3 & position)
 {
-	this->pos = pos;
-	this->posVector = XMLoadFloat3(&this->pos);
+	this->position = position;
+	this->posVector = XMLoadFloat3(&this->position);
 	this->UpdateViewMatrix();
 }
 
 void Camera::SetPosition(float x, float y, float z)
 {
-	this->pos = XMFLOAT3(x, y, z);
-	this->posVector = XMLoadFloat3(&this->pos);
+	this->position = XMFLOAT3(x, y, z);
+	this->posVector = XMLoadFloat3(&this->position);
 	this->UpdateViewMatrix();
 }
 
-void Camera::AdjustPosition(const XMVECTOR & pos)
+void Camera::AdjustPosition(const XMVECTOR & position)
 {
-	this->posVector += pos;
-	XMStoreFloat3(&this->pos, this->posVector);
+	this->posVector += position;
+	XMStoreFloat3(&this->position, this->posVector);
 	this->UpdateViewMatrix();
 }
 
-void Camera::AdjustPosition(const XMFLOAT3 & pos)
+void Camera::AdjustPosition(const XMFLOAT3 & position)
 {
-	this->pos.x += pos.y;
-	this->pos.y += pos.y;
-	this->pos.z += pos.z;
-	this->posVector = XMLoadFloat3(&this->pos);
+	this->position.x += position.y;
+	this->position.y += position.y;
+	this->position.z += position.z;
+	this->posVector = XMLoadFloat3(&this->position);
 	this->UpdateViewMatrix();
 }
 
 void Camera::AdjustPosition(float x, float y, float z)
 {
-	this->pos.x += x;
-	this->pos.y += y;
-	this->pos.z += z;
-	this->posVector = XMLoadFloat3(&this->pos);
+	this->position.x += x;
+	this->position.y += y;
+	this->position.z += z;
+	this->posVector = XMLoadFloat3(&this->position);
 	this->UpdateViewMatrix();
 }
 
-void Camera::SetRotation(const XMVECTOR & rot)
+void Camera::SetRotation(const XMVECTOR & rotation)
 {
-	this->rotVector = rot;
-	XMStoreFloat3(&this->rot, rot);
+	this->rotVector = rotation;
+	XMStoreFloat3(&this->rotation, rotation);
 	this->UpdateViewMatrix();
 }
 
-void Camera::SetRotation(const XMFLOAT3 & rot)
+void Camera::SetRotation(const XMFLOAT3 & rotation)
 {
-	this->rot = rot;
-	this->rotVector = XMLoadFloat3(&this->rot);
+	this->rotation = rotation;
+	this->rotVector = XMLoadFloat3(&this->rotation);
 	this->UpdateViewMatrix();
 }
 
 void Camera::SetRotation(float x, float y, float z)
 {
-	this->rot = XMFLOAT3(x, y, z);
-	this->rotVector = XMLoadFloat3(&this->rot);
+	this->rotation = XMFLOAT3(x, y, z);
+	this->rotVector = XMLoadFloat3(&this->rotation);
 	this->UpdateViewMatrix();
 }
 
-void Camera::AdjustRotation(const XMVECTOR & rot)
+void Camera::AdjustRotation(const XMVECTOR & rotation)
 {
-	this->rotVector += rot;
-	XMStoreFloat3(&this->rot, this->rotVector);
+	this->rotVector += rotation;
+	XMStoreFloat3(&this->rotation, this->rotVector);
 	this->UpdateViewMatrix();
 }
 
-void Camera::AdjustRotation(const XMFLOAT3 & rot)
+void Camera::AdjustRotation(const XMFLOAT3 & rotation)
 {
-	this->rot.x += rot.x;
-	this->rot.y += rot.y;
-	this->rot.z += rot.z;
-	this->rotVector = XMLoadFloat3(&this->rot);
+	this->rotation.x += rotation.x;
+	this->rotation.y += rotation.y;
+	this->rotation.z += rotation.z;
+	this->rotVector = XMLoadFloat3(&this->rotation);
 	this->UpdateViewMatrix();
 }
 
 void Camera::AdjustRotation(float x, float y, float z)
 {
-	this->rot.x += x;
-	this->rot.y += y;
-	this->rot.z += z;
-	this->rotVector = XMLoadFloat3(&this->rot);
+	this->rotation.x += x;
+	this->rotation.y += y;
+	this->rotation.z += z;
+	this->rotVector = XMLoadFloat3(&this->rotation);
 	this->UpdateViewMatrix();
 }
 
 void Camera::SetLookAtPos(XMFLOAT3 lookAtPos)
 {
 	//Verify that look at pos is not the same as cam pos. They cannot be the same as that wouldn't make sense and would result in undefined behavior.
-	if (lookAtPos.x == this->pos.x && lookAtPos.y == this->pos.y && lookAtPos.z == this->pos.z)
+	if (lookAtPos.x == this->position.x && lookAtPos.y == this->position.y && lookAtPos.z == this->position.z)
 		return;
 
-	lookAtPos.x = this->pos.x - lookAtPos.x;
-	lookAtPos.y = this->pos.y - lookAtPos.y;
-	lookAtPos.z = this->pos.z - lookAtPos.z;
+	lookAtPos.x = this->position.x - lookAtPos.x;
+	lookAtPos.y = this->position.y - lookAtPos.y;
+	lookAtPos.z = this->position.z - lookAtPos.z;
 
 	float pitch = 0.0f;
 	if (lookAtPos.y != 0.0f)
@@ -167,12 +167,12 @@ void Camera::SetLookAtPos(XMFLOAT3 lookAtPos)
 
 const XMVECTOR & Camera::GetForwardVector()
 {
-	return this->vec_forward;
+	return this->vecForward;
 }
 
 const XMVECTOR & Camera::GetRightVector()
 {
-	return this->vec_right;
+	return this->vecRight;
 }
 
 const XMVECTOR & Camera::GetBackwardVector()
@@ -187,20 +187,40 @@ const XMVECTOR & Camera::GetLeftVector()
 
 void Camera::UpdateViewMatrix() // 相机的移动和旋转由viewMatrix负责
 {
-	//Calculate camera rotation matrix
-	XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(this->rot.x, this->rot.y, this->rot.z);
-	//Calculate unit vector of cam target based off camera forward value transformed by cam rotation matrix
+	// 相机旋转矩阵
+	XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z);
+	// 计算摄像机的朝向
 	XMVECTOR camTarget = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, camRotationMatrix);
-	//Adjust cam target to be offset by the camera's current position
+	// 朝向的实际位置
 	camTarget += this->posVector;
-	//Calculate up direction based on current rotation
+	// 上方向
 	XMVECTOR upDir = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, camRotationMatrix);
-	//Rebuild view matrix
+	// 重建观察矩阵
 	this->viewMatrix = XMMatrixLookAtLH(this->posVector, camTarget, upDir);
-
-	XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rot.y, 0.0f);
-	this->vec_forward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
+    // 计算相机的4个方向
+	XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
+	this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
 	this->vec_backward = XMVector3TransformCoord(this->DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
 	this->vec_left = XMVector3TransformCoord(this->DEFAULT_LEFT_VECTOR, vecRotationMatrix);
-	this->vec_right = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+	this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+}
+
+void Camera::UpdateWorldMatrix(const XMMATRIX& parentMatrix)
+{
+    // 相机旋转矩阵
+    XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * parentMatrix;
+    // 计算摄像机的朝向
+    XMVECTOR camTarget = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, camRotationMatrix);
+    // 朝向的实际位置
+    camTarget += this->posVector;
+    // 上方向
+    XMVECTOR upDir = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, camRotationMatrix);
+    // 重建观察矩阵
+    this->viewMatrix = XMMatrixLookAtLH(this->posVector, camTarget, upDir);
+    // 计算相机的4个方向
+    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
+    this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
+    this->vec_backward = XMVector3TransformCoord(this->DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
+    this->vec_left = XMVector3TransformCoord(this->DEFAULT_LEFT_VECTOR, vecRotationMatrix);
+    this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
 }

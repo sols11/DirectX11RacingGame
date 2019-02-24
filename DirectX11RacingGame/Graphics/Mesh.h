@@ -14,7 +14,7 @@ public:
     Mesh(const Mesh & mesh);
     void Draw();
 private:
-    VertexBuffer<Vertex> vertexbuffer;
-    IndexBuffer indexbuffer;
+    VertexBuffer<Vertex> vertexBuffer;
+    IndexBuffer indexBuffer;
     ID3D11DeviceContext * deviceContext;
 };

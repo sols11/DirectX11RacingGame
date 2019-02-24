@@ -2,6 +2,7 @@
 
 WindowContent::WindowContent()
 {
+    // 设置原始输入
     static bool rawInputInitialized = false;
     if (rawInputInitialized == false)
     {
@@ -250,7 +251,7 @@ LRESULT CALLBACK HandleMessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_NCCREATE:
     {
         const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
-        WindowContent * pWindow = reinterpret_cast<WindowContent*>(pCreate->lpCreateParams);
+        WindowContent* pWindow = reinterpret_cast<WindowContent*>(pCreate->lpCreateParams);
         if (pWindow == nullptr)
         {
             ErrorLogger::Log("Critical Error: Pointer to window container is null during WM_NCCREATE.");

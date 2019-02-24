@@ -67,11 +67,11 @@ void Engine::Update()
     }
     if (keyboard.KeyIsPressed('('))
     {
-        this->graphics.car.AdjustPosition(this->graphics.car.GetBackwardVector() * objectSpeed * dt);
+        this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * -objectSpeed * dt);
     }
     if (keyboard.KeyIsPressed('%'))
     {
-        this->graphics.car.AdjustRotation(this->graphics.car.GetDownVector() * objectRotSpeed * dt);
+        this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * -objectRotSpeed * dt);
     }
     if (keyboard.KeyIsPressed('\''))
     {

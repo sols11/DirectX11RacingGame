@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include "Geometry.h"
+#include <DDSTextureLoader.h>
 
 bool Graphics::Initialize(HWND hwnd, int width, int height)
 {
@@ -31,8 +32,8 @@ bool Graphics::InitializeDirectX(HWND hwnd)
             return false;
         }
 
+        // ½»»»Á´ÃèÊö
         DXGI_SWAP_CHAIN_DESC scd = { 0 };
-
         scd.BufferDesc.Width = this->windowWidth;
         scd.BufferDesc.Height = this->windowHeight;
         scd.BufferDesc.RefreshRate.Numerator = 60;
@@ -64,7 +65,7 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         hr = this->device->CreateRenderTargetView(backBuffer.Get(), NULL, this->renderTargetView.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create render target view.");
 
-        //Describe our Depth/Stencil Buffer
+        // Depth/Stencil Buffer
         CD3D11_TEXTURE2D_DESC depthStencilTextureDesc(DXGI_FORMAT_D24_UNORM_S8_UINT, this->windowWidth, this->windowHeight);
         depthStencilTextureDesc.MipLevels = 1;
         depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -77,7 +78,7 @@ bool Graphics::InitializeDirectX(HWND hwnd)
 
         this->deviceContext->OMSetRenderTargets(1, this->renderTargetView.GetAddressOf(), this->depthStencilView.Get());
 
-        //Create depth stencil state
+        // Create depth stencil state
         CD3D11_DEPTH_STENCIL_DESC depthstencildesc(D3D11_DEFAULT);
         depthstencildesc.DepthEnable = true;
         depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -86,16 +87,16 @@ bool Graphics::InitializeDirectX(HWND hwnd)
         hr = this->device->CreateDepthStencilState(&depthstencildesc, this->depthStencilState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create depth stencil state.");
 
-        //Create & set the Viewport
-        CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(this->windowWidth), static_cast<float>(this->windowHeight));;
+        // Create & set the Viewport
+        CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(this->windowWidth), static_cast<float>(this->windowHeight));
         this->deviceContext->RSSetViewports(1, &viewport);
 
-        //Create Rasterizer State
+        // Create Rasterizer State
         CD3D11_RASTERIZER_DESC rasterizerDesc(D3D11_DEFAULT);
         hr = this->device->CreateRasterizerState(&rasterizerDesc, this->rasterizerState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
 
-        //Create Rasterizer State for culling front
+        // Create Rasterizer State for culling front
         CD3D11_RASTERIZER_DESC rasterizerDesc_CullFront(D3D11_DEFAULT);
         rasterizerDesc_CullFront.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
         hr = this->device->CreateRasterizerState(&rasterizerDesc_CullFront, this->rasterizerState_CullFront.GetAddressOf());
@@ -167,10 +168,10 @@ bool Graphics::InitializeShaders()
 
     UINT numElements = ARRAYSIZE(layout);
 
-    if (!vertexshader.Initialize(this->device, shaderfolder + L"vertexshader.cso", layout, numElements))
+    if (!vertexshader.Initialize(this->device, shaderfolder + L"VertexShader.cso", layout, numElements))
         return false;
 
-    if (!pixelshader.Initialize(this->device, shaderfolder + L"pixelshader.cso"))
+    if (!pixelshader.Initialize(this->device, shaderfolder + L"PixelShader.cso"))
         return false;
 
     return true;
@@ -181,7 +182,7 @@ bool Graphics::InitializeScene()
     try
     {
         //Load Texture
-        HRESULT hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\daylight.jpg", nullptr, skyTexture.GetAddressOf());
+        HRESULT hr = CreateDDSTextureFromFile(this->device.Get(), L"Data\\Textures\\floor.dds", nullptr, skyTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create dds texture from file.");
 
         hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
@@ -207,21 +208,8 @@ bool Graphics::InitializeScene()
         if (!model.Initialize("Data\\Objects\\light.fbx", this->device.Get(), this->deviceContext.Get(), this->grassTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
-        Vertex planeVertexs[] =
-        {
-            Vertex(-10, 0, -10, 0, 0),
-            Vertex(-10, 0,  10, 0, 1),
-            Vertex(10, 0, -10, 1, 0),
-            Vertex(10, 0,  10, 1, 1),
-        };
-        DWORD planeIndices[] =
-        {
-            0,1,2,
-            1,3,2,
-        };
-
         auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0,-1.0f,0));
-        if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->pavementTexture.Get(), this->cb_vs_vertexshader))
+        if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->skyTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
         model.SetPosition(0, 5, 0);

@@ -9,7 +9,6 @@
 #include "Camera.h"
 #include "..\Basic\Timer.h"
 #include "Model.h"
-#include "HandDrawObject.h"
 #include "Skybox.h"
 #include "Car.h"
 
@@ -20,7 +19,7 @@ public:
     void RenderFrame();
     Camera camera;
     Model model;
-    HandDrawObject plane;
+    Model plane;
     Skybox skybox;
     Car car;
 

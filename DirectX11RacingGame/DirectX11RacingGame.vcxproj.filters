@@ -66,12 +66,6 @@
     <ClCompile Include="Graphics\Mesh.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Model.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\HandDrawObject.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\Skybox.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -88,6 +82,9 @@
       <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Car.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Model.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,12 +137,6 @@
     <ClInclude Include="Graphics\Mesh.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Model.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\HandDrawObject.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\Skybox.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
@@ -165,6 +156,9 @@
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Geometry.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Model.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
