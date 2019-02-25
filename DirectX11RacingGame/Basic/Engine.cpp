@@ -84,11 +84,11 @@ void Engine::Update()
     }
     if (keyboard.KeyIsPressed('S'))
     {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetBackwardVector() * cameraSpeed * dt);
+        this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -cameraSpeed * dt);
     }
     if (keyboard.KeyIsPressed('A'))
     {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetLeftVector() * cameraSpeed * dt);
+        this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * -cameraSpeed * dt);
     }
     if (keyboard.KeyIsPressed('D'))
     {

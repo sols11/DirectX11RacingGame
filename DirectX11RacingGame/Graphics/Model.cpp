@@ -69,9 +69,11 @@ void Model::Draw(const XMMATRIX & viewProjectionMatrix)
     }
 }
 
-void Model::UpdateWorldMatrix(XMMATRIX parentWorldMatrix)
+void Model::UpdateWorldMatrix(Model* parent)
 {
-    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z) * parentWorldMatrix;
+    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
+    if (parent != nullptr)
+        this->worldMatrix *= parent->GetWorldMatrix();
     XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
     this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
     this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);

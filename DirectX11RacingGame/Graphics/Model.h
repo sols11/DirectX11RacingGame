@@ -42,7 +42,7 @@ public:
     const XMVECTOR & GetUpVector();
     const XMMATRIX& GetWorldMatrix();
     void XM_CALLCONV SetWorldMatrix(XMMATRIX world);
-    void virtual UpdateWorldMatrix(XMMATRIX parentWorldMatrix = XMMatrixIdentity());
+    void virtual UpdateWorldMatrix(Model* parent = nullptr);
 
 protected:
     bool LoadModel(const std::string & filePath);

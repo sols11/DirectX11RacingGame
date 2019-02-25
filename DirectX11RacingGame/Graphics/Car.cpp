@@ -26,13 +26,10 @@ void Car::Draw(const XMMATRIX& viewProjectionMatrix)
     wheels[0].Draw(viewProjectionMatrix);
 }
 
-void Car::UpdateWorldMatrix(XMMATRIX parentWorldMatrix)
+void Car::UpdateWorldMatrix(Model* parent)
 {
-    this->worldMatrix = XMMatrixRotationRollPitchYaw(this->rotation.x, this->rotation.y, this->rotation.z) * XMMatrixTranslation(this->position.x, this->position.y, this->position.z) *parentWorldMatrix;
-    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, this->rotation.y, 0.0f);
-    this->vecForward = XMVector3TransformCoord(this->DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
-    this->vecRight = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
-    this->vecUp = XMVector3TransformCoord(this->DEFAULT_UP_VECTOR, vecRotationMatrix);
-
-    wheels[0].UpdateWorldMatrix(this->worldMatrix);
+    Model::UpdateWorldMatrix(parent);
+    wheels[0].UpdateWorldMatrix(this);
+    if(camera != nullptr)
+        camera->UpdateWorldMatrix(this);
 }
