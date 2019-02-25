@@ -216,7 +216,9 @@ bool Graphics::InitializeScene()
         camera.SetPosition(0.0f, 2.0f, -4.0f);
         //XMFLOAT3 originPoint(0, 0, 0);
         camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
-        car.camera = &camera;
+        camera.SetTarget(&car);
+        camera.SetDistance(8.0f);
+        camera.SetDistanceMinMax(3.0f, 20.0f);
     }
     catch (COMException & exception)
     {

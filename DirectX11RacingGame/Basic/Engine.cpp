@@ -52,7 +52,10 @@ void Engine::Update()
         {
             if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
             {
-                this->graphics.camera.AdjustRotation((float)me.GetPosY() * 0.01f, (float)me.GetPosX() * 0.01f, 0);
+                //this->graphics.camera.AdjustRotation((float)me.GetPosY() * 0.01f, (float)me.GetPosX() * 0.01f, 0);
+                // 绕物体旋转
+                this->graphics.camera.RotateX((float)me.GetPosY() * dt * 0.01f);
+                this->graphics.camera.RotateY((float)me.GetPosX() * dt * 0.01f);
             }
         }
     }
@@ -102,6 +105,7 @@ void Engine::Update()
     {
         this->graphics.camera.AdjustPosition(0.0f, -cameraSpeed * dt, 0.0f);
     }
+    this->graphics.camera.UpdateWorldMatrix(nullptr);
     // 第一人称
     //graphics.object.SetWorldMatrix(XMMatrixTranslation(graphics.camera.GetPositionFloat3().x, graphics.camera.GetPositionFloat3().y, graphics.camera.GetPositionFloat3().z));
 

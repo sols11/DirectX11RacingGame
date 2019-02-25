@@ -30,6 +30,4 @@ void Car::UpdateWorldMatrix(Model* parent)
 {
     Model::UpdateWorldMatrix(parent);
     wheels[0].UpdateWorldMatrix(this);
-    if(camera != nullptr)
-        camera->UpdateWorldMatrix(this);
 }
