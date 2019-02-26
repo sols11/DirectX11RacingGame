@@ -205,20 +205,14 @@ bool Graphics::InitializeScene()
 
         car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader);
 
-        if (!model.Initialize("Data\\Objects\\light.fbx", this->device.Get(), this->deviceContext.Get(), this->grassTexture.Get(), this->cb_vs_vertexshader))
-            return false;
-
-        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0,-1.0f,0));
+        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0,-0.8f,0));
         if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->skyTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
-        model.SetPosition(0, 5, 0);
-        camera.SetPosition(0.0f, 2.0f, -4.0f);
-        //XMFLOAT3 originPoint(0, 0, 0);
-        camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
+        camera.SetFrustum(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
         camera.SetTarget(&car);
-        camera.SetDistance(8.0f);
-        camera.SetDistanceMinMax(3.0f, 20.0f);
+        camera.SetDistance(5.0f);
+        camera.SetDistanceMinMax(3.0f, 10.0f);
     }
     catch (COMException & exception)
     {
@@ -243,19 +237,16 @@ void Graphics::RenderFrame()
     this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
     this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
 
-    {
-        XMMATRIX matrix = camera.GetViewMatrix() * camera.GetProjectionMatrix();
-
-        this->model.Draw(matrix);
-        this->plane.Draw(matrix);
-        this->skybox.Draw(matrix);
-        this->car.Draw(matrix);
-        // 第三人称锁定 camera.SetLookAtPos(object.GetPositionFloat3());
-    }
+    XMMATRIX matrix = camera.GetViewMatrix() * camera.GetProjectionMatrix();
+    this->plane.Draw(matrix);
+    this->skybox.Draw(matrix);
+    this->car.Draw(matrix);
 
     //Draw Text
     static int fpsCounter = 0;
     static std::string fpsString = "FPS: 0";
+    // 按键切换视角: 1-第一人称 2-第三人称 \nW/S/A/D 前进/后退/左转/右转 \n第三人称下鼠标右键移动控制视野\n
+    static std::wstring text = L"Input: 1-FirstPerson 2-ThirdPeron \nW/S/A/D Move \nRight mouse button motion control vision\n";
     fpsCounter += 1;
     if (fpsTimer.GetMilisecondsElapsed() > 1000.0)
     {
@@ -265,6 +256,7 @@ void Graphics::RenderFrame()
     }
     spriteBatch->Begin();
     spriteFont->DrawString(spriteBatch.get(), StringConverter::StringToWstring(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteFont->DrawString(spriteBatch.get(), text.c_str(), DirectX::XMFLOAT2(0, 30), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
     static int counter = 0;

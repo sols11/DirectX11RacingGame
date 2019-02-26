@@ -27,13 +27,13 @@ void Mouse::OnRightReleased(int x, int y)
 
 void Mouse::OnMiddlePressed(int x, int y)
 {
-	this->mbuttonDown = true;
+	this->midButtonDown = true;
 	this->eventBuffer.push(MouseEvent(MouseEvent::EventType::MPress, x, y));
 }
 
 void Mouse::OnMiddleReleased(int x, int y)
 {
-	this->mbuttonDown = false;
+	this->midButtonDown = false;
 	this->eventBuffer.push(MouseEvent(MouseEvent::EventType::MRelease, x, y));
 }
 
@@ -66,7 +66,7 @@ bool Mouse::IsLeftDown()
 
 bool Mouse::IsMiddleDown()
 {
-	return this->mbuttonDown;
+	return this->midButtonDown;
 }
 
 bool Mouse::IsRightDown()

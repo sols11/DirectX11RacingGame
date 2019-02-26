@@ -120,9 +120,9 @@ Mesh Model::ProcessMesh(aiMesh * mesh, const aiScene * scene)
     {
         Vertex vertex;
 
-        vertex.pos.x = mesh->mVertices[i].x;
-        vertex.pos.y = mesh->mVertices[i].y;
-        vertex.pos.z = mesh->mVertices[i].z;
+        vertex.position.x = mesh->mVertices[i].x;
+        vertex.position.y = mesh->mVertices[i].y;
+        vertex.position.z = mesh->mVertices[i].z;
 
         if (mesh->mTextureCoords[0])
         {

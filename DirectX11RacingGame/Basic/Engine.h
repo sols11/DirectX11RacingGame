@@ -10,4 +10,7 @@ public:
     void RenderFrame();
 private:
     Timer timer;
+    float cameraSpeed = 0.006f;
+    float carSpeed = 0.003f;
+    float carRotSpeed = 0.003f;
 };

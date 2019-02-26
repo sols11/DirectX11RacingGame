@@ -31,7 +31,7 @@ private:
 	std::queue<MouseEvent> eventBuffer;
 	bool leftIsDown = false;
 	bool rightIsDown = false;
-	bool mbuttonDown = false;
+	bool midButtonDown = false;
 	int x = 0;
 	int y = 0;
 };

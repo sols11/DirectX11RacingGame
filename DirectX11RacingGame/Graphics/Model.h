@@ -49,6 +49,8 @@ protected:
     void ProcessNode(aiNode * node, const aiScene * scene);
     Mesh ProcessMesh(aiMesh * mesh, const aiScene * scene);
 
+    std::vector<Mesh> meshes;
+
     ID3D11Device * device = nullptr;
     ID3D11DeviceContext * deviceContext = nullptr;
     ConstantBuffer<CB_VS_VertexShader> * cb_vs_vertexshader = nullptr;
@@ -65,12 +67,10 @@ protected:
     XMFLOAT3 rotation;
 
     const XMVECTOR DEFAULT_FORWARD_VECTOR = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-    const XMVECTOR DEFAULT_RIGHT_VECTOR =   XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+    const XMVECTOR DEFAULT_RIGHT_VECTOR = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
     const XMVECTOR DEFAULT_UP_VECTOR = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
     XMVECTOR vecForward;
     XMVECTOR vecRight;
     XMVECTOR vecUp;
-
-    std::vector<Mesh> meshes;
 };

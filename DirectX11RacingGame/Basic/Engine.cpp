@@ -15,7 +15,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string windowTitle, std::strin
 
 void Engine::Update()
 {
-    float dt = timer.GetMilisecondsElapsed();
+    float deltaTime = timer.GetMilisecondsElapsed();
     timer.Restart();
 
     while (!keyboard.CharBufferIsEmpty())
@@ -45,70 +45,124 @@ void Engine::Update()
         OutputDebugStringA(outmsg.c_str());
     }
 
+    if (keyboard.KeyIsPressed('1') && this->graphics.camera.mode != Camera::Mode::FirstPerson)
+    {
+        this->graphics.camera.mode = Camera::Mode::FirstPerson;
+        this->graphics.camera.SetPosition(this->graphics.car.GetPositionVector());
+        this->graphics.camera.SetRotation(this->graphics.car.GetRotationVector());
+        this->graphics.car.dontDraw = true;
+    }
+    else if (keyboard.KeyIsPressed('2') && this->graphics.camera.mode != Camera::Mode::ThirdPerson)
+    {
+        this->graphics.camera.mode = Camera::Mode::ThirdPerson;
+        this->graphics.car.SetPosition(this->graphics.camera.GetPositionVector());
+        this->graphics.car.dontDraw = false;
+    }
+
     while (!mouse.EventBufferIsEmpty())
     {
-        MouseEvent me = mouse.ReadEvent();
+        MouseEvent mouseEvent = mouse.ReadEvent();
         if (mouse.IsRightDown())
         {
-            if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
+            if (mouseEvent.GetType() == MouseEvent::EventType::RAW_MOVE)
             {
-                //this->graphics.camera.AdjustRotation((float)me.GetPosY() * 0.01f, (float)me.GetPosX() * 0.01f, 0);
+                // 自由旋转
+                if (this->graphics.camera.mode == Camera::Mode::Free)
+                {
+                    this->graphics.camera.AdjustRotation((float)mouseEvent.GetPosY() * 0.01f, (float)mouseEvent.GetPosX() * 0.01f, 0);
+                }
                 // 绕物体旋转
-                this->graphics.camera.RotateX((float)me.GetPosY() * dt * 0.01f);
-                this->graphics.camera.RotateY((float)me.GetPosX() * dt * 0.01f);
+                else if (this->graphics.camera.mode == Camera::Mode::ThirdPerson)
+                {
+                    this->graphics.camera.RotateX((float)mouseEvent.GetPosY() * deltaTime * 0.01f);
+                    this->graphics.camera.RotateY((float)mouseEvent.GetPosX() * deltaTime * 0.01f);
+                }
             }
         }
     }
 
-    const float cameraSpeed = 0.006f;
-    float objectSpeed = 0.003f;
-    float objectRotSpeed = 0.003f;
-
-    if (keyboard.KeyIsPressed('&'))
+    // 自由移动相机
+    if (this->graphics.camera.mode == Camera::Mode::Free)
     {
-        this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * objectSpeed * dt);
+        if (keyboard.KeyIsPressed('W'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('S'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('A'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * -cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('D'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed(VK_SPACE))
+        {
+            this->graphics.camera.AdjustPosition(0.0f, cameraSpeed * deltaTime, 0.0f);
+        }
+        if (keyboard.KeyIsPressed('X'))
+        {
+            this->graphics.camera.AdjustPosition(0.0f, -cameraSpeed * deltaTime, 0.0f);
+        }
     }
-    if (keyboard.KeyIsPressed('('))
+    // 控制汽车移动
+    else
     {
-        this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * -objectSpeed * dt);
+        if (keyboard.KeyIsPressed('W')) // ↑
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * carSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(deltaTime);    // 要在car调用AdjustPosition之前调用
+                this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * carSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('S')) // ↓
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -carSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(-deltaTime);
+                this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * -carSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('A')) // ←
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustRotation(this->graphics.camera.GetUpVector() * -carRotSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(deltaTime);
+                this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * -carRotSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('D')) // →
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustRotation(this->graphics.camera.GetUpVector() * carRotSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(deltaTime);
+                this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * carRotSpeed * deltaTime);
+            }
+        }
     }
-    if (keyboard.KeyIsPressed('%'))
-    {
-        this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * -objectRotSpeed * dt);
-    }
-    if (keyboard.KeyIsPressed('\''))
-    {
-        this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * objectRotSpeed * dt);
-    }
-
-    if (keyboard.KeyIsPressed('W'))
-    {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * cameraSpeed * dt);
-    }
-    if (keyboard.KeyIsPressed('S'))
-    {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -cameraSpeed * dt);
-    }
-    if (keyboard.KeyIsPressed('A'))
-    {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * -cameraSpeed * dt);
-    }
-    if (keyboard.KeyIsPressed('D'))
-    {
-        this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * cameraSpeed * dt);
-    }
-    if (keyboard.KeyIsPressed(VK_SPACE))
-    {
-        this->graphics.camera.AdjustPosition(0.0f, cameraSpeed * dt, 0.0f);
-    }
-    if (keyboard.KeyIsPressed('X'))
-    {
-        this->graphics.camera.AdjustPosition(0.0f, -cameraSpeed * dt, 0.0f);
-    }
-    this->graphics.camera.UpdateWorldMatrix(nullptr);
-    // 第一人称
-    //graphics.object.SetWorldMatrix(XMMatrixTranslation(graphics.camera.GetPositionFloat3().x, graphics.camera.GetPositionFloat3().y, graphics.camera.GetPositionFloat3().z));
-
+    // 最后再更新相机
+    this->graphics.camera.UpdateViewMatrix();
 }
 
 void Engine::RenderFrame()
