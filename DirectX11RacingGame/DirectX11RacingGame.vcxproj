@@ -155,6 +155,7 @@
     <ClCompile Include="Graphics\Graphics.cpp" />
     <ClCompile Include="Graphics\Model.cpp" />
     <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Graphics\Object.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\Skybox.cpp" />
     <ClCompile Include="Input\Keyboard.cpp" />
@@ -177,9 +178,11 @@
     <ClInclude Include="Graphics\ConstantBufferType.h" />
     <ClInclude Include="Graphics\Geometry.h" />
     <ClInclude Include="Graphics\Graphics.h" />
+    <ClInclude Include="Graphics\Light.h" />
     <ClInclude Include="Graphics\Model.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\Mesh.h" />
+    <ClInclude Include="Graphics\Object.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\Skybox.h" />
     <ClInclude Include="Graphics\Vertex.h" />

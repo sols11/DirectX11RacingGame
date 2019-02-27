@@ -10,7 +10,7 @@ public:
     void WheelRoll(float deltaTime, bool forward = true);
     bool dontDraw = false;
 protected:
-    void UpdateWorldMatrix(Model* parent = nullptr);
+    void UpdateWorldMatrix(Object* parent = nullptr);
 private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> bodyTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> wheelTexture;

@@ -11,6 +11,7 @@
 #include "Model.h"
 #include "Skybox.h"
 #include "Car.h"
+#include "Light.h"
 
 class Graphics
 {
@@ -18,7 +19,7 @@ public:
     bool Initialize(HWND hwnd, int width, int height);
     void RenderFrame();
     Camera camera;
-    Model model;
+    Light light;
     Model plane;
     Skybox skybox;
     Car car;
@@ -49,10 +50,7 @@ private:
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> skyTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> planeTexture;
 
     int windowWidth = 0;
     int windowHeight = 0;

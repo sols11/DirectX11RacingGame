@@ -48,9 +48,9 @@ void Car::WheelRoll(float deltaTime, bool forward)
     }
 }
 
-void Car::UpdateWorldMatrix(Model* parent)
+void Car::UpdateWorldMatrix(Object* parent)
 {
-    Model::UpdateWorldMatrix(parent);
+    Object::UpdateWorldMatrix(parent);
     for (int i = 0; i < 4; ++i)
     {
         wheels[i].UpdateWorldMatrix(this);

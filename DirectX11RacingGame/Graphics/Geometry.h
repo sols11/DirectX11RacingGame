@@ -40,7 +40,7 @@ public:
 
 	// 创建只有圆柱体侧面的网格数据，slices越大，精度越高
 	template<class VertexType = Vertex, class IndexType = DWORD>
-	static MeshData<VertexType, IndexType> CreateCylinderNoCap(float radius = 1.0f, float height = 2.0f, int slices = 5);
+	static MeshData<VertexType, IndexType> CreateCylinderSide(float radius = 1.0f, float height = 2.0f, int slices = 5);
 
 	// 创建一个平面
 	template<class VertexType = Vertex, class IndexType = DWORD>
@@ -82,7 +82,7 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateSphere(float ra
 
 	VertexData vertexData;
 	IndexType vIndex = 0, iIndex = 0;
-
+    // 球体是根据两个角度的迭代计算出来的，可以看做是经度和维度
 	float phi = 0.0f, theta = 0.0f;
 	float per_phi = XM_PI / levels;
 	float per_theta = XM_2PI / slices;
@@ -99,8 +99,8 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateSphere(float ra
 		for (int j = 0; j <= slices; ++j)
 		{
 			theta = per_theta * j;
-			x = radius * sinf(phi) * cosf(theta);
-			y = radius * cosf(phi);
+			x = radius * sinf(phi) * cosf(theta);   // x和z轴需要先根据纬度拿到所在圆的半径，再确定坐标
+			y = radius * cosf(phi);     // y轴直接cos纬度即可
 			z = radius * sinf(phi) * sinf(theta);
 			// 计算出局部坐标和纹理坐标
 			XMFLOAT3 position = XMFLOAT3(x, y, z);
@@ -112,7 +112,6 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateSphere(float ra
 	// 放入底端点
 	vertexData = { XMFLOAT3(0.0f, -radius, 0.0f), XMFLOAT2(0.0f, 1.0f) };
     ConvertToVertexType(meshData.vertexVec[vIndex], vertexData);
-
 
 	// 逐渐放入索引
 	if (levels > 1)
@@ -222,11 +221,11 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateBox(float lengt
 }
 
 template<class VertexType, class IndexType>
-inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float radius, float height, int slices)
+inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float radius, float height, int slices)    
 {
 	using namespace DirectX;
 
-	auto meshData = CreateCylinderNoCap<VertexType, IndexType>(radius, height, slices);
+	auto meshData = CreateCylinderSide<VertexType, IndexType>(radius, height, slices);
 	meshData.vertexVec.resize(4 * (slices + 1) + 2);
 	meshData.indexVec.resize(12 * slices);
 
@@ -240,14 +239,14 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float 
 
 	// 放入顶端圆心
 	vertexData = { XMFLOAT3(0.0f, h2, 0.0f), XMFLOAT2(0.5f, 0.5f) };
-	ConvertToVertexType(meshData.vertexVec[vIndex], vertexData);
+	ConvertToVertexType(meshData.vertexVec[vIndex++], vertexData);
 
 	// 放入顶端圆上各点
 	for (int i = 0; i <= slices; ++i)
 	{
 		theta = i * per_theta;
 		vertexData = { XMFLOAT3(radius * cosf(theta), h2, radius * sinf(theta)), XMFLOAT2(cosf(theta) / 2 + 0.5f, sinf(theta) / 2 + 0.5f) };
-        ConvertToVertexType(meshData.vertexVec[vIndex], vertexData);
+        ConvertToVertexType(meshData.vertexVec[vIndex++], vertexData);
 	}
 
 	// 放入底部圆上各点
@@ -255,12 +254,12 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float 
 	{
 		theta = i * per_theta;
 		vertexData = { XMFLOAT3(radius * cosf(theta), -h2, radius * sinf(theta)), XMFLOAT2(cosf(theta) / 2 + 0.5f, sinf(theta) / 2 + 0.5f) };
-        ConvertToVertexType(meshData.vertexVec[vIndex], vertexData);
+        ConvertToVertexType(meshData.vertexVec[vIndex++], vertexData);
 	}
 
 	// 放入底端圆心
 	vertexData = { XMFLOAT3(0.0f, -h2, 0.0f), XMFLOAT2(0.5f, 0.5f) };
-    ConvertToVertexType(meshData.vertexVec[vIndex], vertexData);
+    ConvertToVertexType(meshData.vertexVec[vIndex++], vertexData);
 
 	// 逐渐放入顶部三角形索引
 	for (int i = 1; i <= slices; ++i)
@@ -272,7 +271,7 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float 
 
 	// 逐渐放入底部三角形索引
 	offset += slices + 2;
-	for (int i = 1; i <= slices; ++i)
+	for (int i = 1; i <= slices; ++i) 
 	{
 		meshData.indexVec[iIndex++] = offset;
 		meshData.indexVec[iIndex++] = offset + i;
@@ -283,7 +282,7 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinder(float 
 }
 
 template<class VertexType, class IndexType>
-inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinderNoCap(float radius, float height, int slices)
+inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinderSide(float radius, float height, int slices)
 {
 	using namespace DirectX;
     // 初始化
@@ -292,30 +291,30 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinderNoCap(f
 	meshData.indexVec.resize(6 * slices);
 
 	size_t iIndex = 0;
-
+    // 这里我们只分两层，即顶层和底层，来绘制侧面
 	float h2 = height / 2;
 	float theta = 0.0f;
-	float per_theta = XM_2PI / slices;
+	float deltaTheta = XM_2PI / slices; // 得到每个切面的计算角度
 
 	VertexData vertexData;
 
-	// 放入侧面顶端点
+	// 放入侧面顶端点（时间不够做第二张贴图，所以就把侧面的uv绘制为纯色）
 	for (int i = 0; i <= slices; ++i)
 	{
-		theta = i * per_theta;
-		vertexData = { XMFLOAT3(radius * cosf(theta), h2, radius * sinf(theta)), XMFLOAT2(theta / XM_2PI, 0.0f) };
+		theta = i * deltaTheta;
+		vertexData = { XMFLOAT3(radius * cosf(theta), h2, radius * sinf(theta)), XMFLOAT2(0, 0) };
         ConvertToVertexType(meshData.vertexVec[i], vertexData);
 	}
 
 	// 放入侧面底端点
 	for (int i = 0; i <= slices; ++i)
 	{
-		theta = i * per_theta;
-		vertexData = { XMFLOAT3(radius * cosf(theta), -h2, radius * sinf(theta)), XMFLOAT2(theta / XM_2PI, 1.0f) };
+		theta = i * deltaTheta;
+		vertexData = { XMFLOAT3(radius * cosf(theta), -h2, radius * sinf(theta)), XMFLOAT2(0, 1) };
         ConvertToVertexType(meshData.vertexVec[(slices + 1) + i], vertexData);
 	}
 
-	// 放入索引
+	// 放入索引（只有两层，所以一个切面只有两个三角形）
 	for (int i = 0; i < slices; ++i)
 	{
 		meshData.indexVec[iIndex++] = i;
@@ -331,8 +330,7 @@ inline Geometry::MeshData<VertexType, IndexType> Geometry::CreateCylinderNoCap(f
 }
 
 template<class VertexType, class IndexType>
-inline Geometry::MeshData<VertexType, IndexType> Geometry::CreatePlane(const DirectX::XMFLOAT3 & center, const DirectX::XMFLOAT2 & planeSize,
-	const DirectX::XMFLOAT2 & maxTexCoord)
+inline Geometry::MeshData<VertexType, IndexType> Geometry::CreatePlane(const DirectX::XMFLOAT3 & center, const DirectX::XMFLOAT2 & planeSize, const DirectX::XMFLOAT2 & maxTexCoord)
 {
 	return CreatePlane<VertexType, IndexType>(center.x, center.y, center.z, planeSize.x, planeSize.y, maxTexCoord.x, maxTexCoord.y);
 }

@@ -56,6 +56,7 @@ void Engine::Update()
     {
         this->graphics.camera.mode = Camera::Mode::ThirdPerson;
         this->graphics.car.SetPosition(this->graphics.camera.GetPositionVector());
+        this->graphics.camera.SetRotation(1.0f, -XM_PIDIV2, 0.0f);
         this->graphics.car.dontDraw = false;
     }
 
@@ -144,7 +145,8 @@ void Engine::Update()
             }
             else
             {
-                this->graphics.car.WheelRoll(deltaTime);
+                if(!keyboard.KeyIsPressed('S')) // 倒退时不干扰旋转
+                    this->graphics.car.WheelRoll(deltaTime);
                 this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * -carRotSpeed * deltaTime);
             }
         }
@@ -156,7 +158,8 @@ void Engine::Update()
             }
             else
             {
-                this->graphics.car.WheelRoll(deltaTime);
+                if (!keyboard.KeyIsPressed('S'))
+                    this->graphics.car.WheelRoll(deltaTime);
                 this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * carRotSpeed * deltaTime);
             }
         }

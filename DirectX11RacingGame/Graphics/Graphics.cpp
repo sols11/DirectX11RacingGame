@@ -182,16 +182,7 @@ bool Graphics::InitializeScene()
     try
     {
         //Load Texture
-        HRESULT hr = CreateDDSTextureFromFile(this->device.Get(), L"Data\\Textures\\floor.dds", nullptr, skyTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create dds texture from file.");
-
-        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
-
-        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
-
-        hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
+        HRESULT hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\plane.jpg", nullptr, planeTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
         //Initialize Constant Buffer(s)
@@ -201,12 +192,17 @@ bool Graphics::InitializeScene()
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
-        skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000);
+        if(skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000))
+            return false;
 
-        car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader);
+        if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
+            return false;
 
-        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0,-0.8f,0));
-        if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->skyTexture.Get(), this->cb_vs_vertexshader))
+        if(car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
+            return false;
+
+        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0, -0.8f, 0), XMFLOAT2(100, 100));
+        if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->planeTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
         camera.SetFrustum(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
@@ -239,7 +235,7 @@ void Graphics::RenderFrame()
 
     XMMATRIX matrix = camera.GetViewMatrix() * camera.GetProjectionMatrix();
     this->plane.Draw(matrix);
-    this->skybox.Draw(matrix);
+    this->skybox.Draw(camera, matrix);
     this->car.Draw(matrix);
 
     //Draw Text

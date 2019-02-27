@@ -3,10 +3,10 @@
 #include "Model.h"
 using namespace DirectX;
 
-class Camera : public Model
+class Camera : public Object
 {
+    // 相机是没有实际模型的，因此只继承Object
 public:
-    // 相机可以是没有实际模型的，因此不需要调用Initialize和Draw方法就可以使用
 	Camera();
 	
     enum class Mode 

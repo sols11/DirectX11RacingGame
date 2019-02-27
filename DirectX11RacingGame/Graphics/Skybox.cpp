@@ -77,11 +77,13 @@ void Skybox::SetTexture(ID3D11ShaderResourceView * texture, int index)
     this->texture[index] = texture;
 }
 
-void Skybox::Draw(const XMMATRIX & viewProjectionMatrix)
+void Skybox::Draw(const Camera& camera, const XMMATRIX & viewProjectionMatrix)
 {
-    //Update Constant buffer with WVP Matrix
-    this->cb_vs_vertexshader->data.matrix = this->worldMatrix * viewProjectionMatrix; //Calculate World-View-Projection Matrix
-    this->cb_vs_vertexshader->data.matrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.matrix);
+    // 根据相机移动
+    XMFLOAT3 position = camera.GetPositionFloat3();
+    this->worldMatrix = XMMatrixTranslation(position.x, position.y, position.z);
+    this->cb_vs_vertexshader->data.matrix = this->worldMatrix * viewProjectionMatrix;
+    this->cb_vs_vertexshader->data.matrix = XMMatrixTranspose(this->cb_vs_vertexshader->data.matrix);   // 转置
     this->cb_vs_vertexshader->ApplyChanges();
     this->deviceContext->VSSetConstantBuffers(0, 1, this->cb_vs_vertexshader->GetAddressOf());
 
