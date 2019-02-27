@@ -1,6 +1,8 @@
-cbuffer alphaBuffer : register(b0)
+// 添加光照需要的ConstantBuffer（删掉了alpha因为一个shader只能有一个buffer）
+cbuffer lightBuffer : register(b0)
 {
-    float alpha;
+    float3 ambientLightColor;
+    float ambientLightStrength;
 }
 
 struct PS_INPUT
@@ -14,6 +16,9 @@ SamplerState objSamplerState : SAMPLER : register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-    float3 pixelColor = objTexture.Sample(objSamplerState, input.inTexCoord);
-    return float4(pixelColor, alpha);
+    float3 sampleColor = objTexture.Sample(objSamplerState, input.inTexCoord);
+    // 光照与纹理颜色混合
+    float3 ambientLight = ambientLightColor * ambientLightStrength;
+    float3 finalColor = sampleColor * ambientLight;
+    return float4(finalColor, 1.0f);
 }

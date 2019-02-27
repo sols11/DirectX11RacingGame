@@ -1,14 +1,20 @@
 #include "Light.h"
 
-bool Light::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext, ConstantBuffer<CB_VS_VertexShader>& cb_vs_vertexshader)
+bool Light::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext)
 {
     this->device = device;
     this->deviceContext = deviceContext;
-    this->cb_vs_vertexshader = &cb_vs_vertexshader;
+    
+    HRESULT hr = this->cb_vs_light.Initialize(device, deviceContext);
+    COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
-    this->SetPosition(0.0f, 0.0f, 0.0f);
-    this->SetRotation(0.0f, 0.0f, 0.0f);
-    this->UpdateWorldMatrix();
+    return true;
+}
 
-    return false;
+void Light::SetLightProperties(XMFLOAT3 color, float strength)
+{
+    this->cb_vs_light.data.ambientLightColor = color;
+    this->cb_vs_light.data.ambientLightStrength = strength;
+    this->cb_vs_light.ApplyChanges();
+    this->deviceContext->PSSetConstantBuffers(0, 1, this->cb_vs_light.GetAddressOf());
 }

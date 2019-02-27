@@ -69,7 +69,7 @@ bool Skybox::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceConte
     hr = this->indexBuffer.Initialize(this->device, indices, ARRAYSIZE(indices));
     COM_ERROR_IF_FAILED(hr, "Failed to initialize index buffer.");
 
-    return false;
+    return true;
 }
 
 void Skybox::SetTexture(ID3D11ShaderResourceView * texture, int index)

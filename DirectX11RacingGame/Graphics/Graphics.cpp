@@ -1,5 +1,5 @@
 #include "Graphics.h"
-#include "Geometry.h"
+#include "Prefab.h"
 #include <DDSTextureLoader.h>
 
 bool Graphics::Initialize(HWND hwnd, int width, int height)
@@ -185,26 +185,27 @@ bool Graphics::InitializeScene()
         HRESULT hr = CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\plane.jpg", nullptr, planeTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
-        //Initialize Constant Buffer(s)
+        //Initialize Constant Buffers
         hr = this->cb_vs_vertexshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
         hr = this->cb_ps_pixelshader.Initialize(this->device.Get(), this->deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize constant buffer.");
 
-        if(skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000))
+        if(!skybox.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader, 1000))
             return false;
 
-        if (!light.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
+        if (!light.Initialize(this->device.Get(), this->deviceContext.Get()))
             return false;
 
-        if(car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
+        if(!car.Initialize(this->device.Get(), this->deviceContext.Get(), this->cb_vs_vertexshader))
             return false;
 
-        auto planeMeshData = Geometry::CreatePlane(XMFLOAT3(0, -0.8f, 0), XMFLOAT2(100, 100));
+        auto planeMeshData = Prefab::CreatePlane(XMFLOAT3(0, -0.8f, 0), XMFLOAT2(100, 100));
         if (!plane.Initialize(planeMeshData.vertexVec, planeMeshData.indexVec, this->device.Get(), this->deviceContext.Get(), this->planeTexture.Get(), this->cb_vs_vertexshader))
             return false;
 
+        light.SetLightProperties(XMFLOAT3(1, 1, 1), 0.8f);
         camera.SetFrustum(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 2000.0f);
         camera.SetTarget(&car);
         camera.SetDistance(5.0f);

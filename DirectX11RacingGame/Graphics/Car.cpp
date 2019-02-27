@@ -5,14 +5,14 @@ bool Car::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext,
 {
     HRESULT hr = DirectX::CreateWICTextureFromFile(device, L"Data\\Textures\\red.png", nullptr, bodyTexture.GetAddressOf());
     COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
-    auto bodyMeshData = Geometry::CreateBox(1.0f, 1.0f, 3.0f);
+    auto bodyMeshData = Prefab::CreateBox(1.0f, 1.0f, 3.0f);
     // µ÷ÓÃ¸¸Àà
     Model::Initialize(bodyMeshData.vertexVec, bodyMeshData.indexVec, device, deviceContext, bodyTexture.Get(), cb_vs_vertexshader);
 
     hr = DirectX::CreateWICTextureFromFile(device, L"Data\\Textures\\wheelBlack.jpg", nullptr, wheelTexture.GetAddressOf());
     COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file.");
 
-    auto wheelMeshData = Geometry::CreateCylinder(0.3f, 0.1f);
+    auto wheelMeshData = Prefab::CreateCylinder(0.3f, 0.1f);
     for (int i = 0; i < 4; ++i)
     {
         wheels[i].Initialize(wheelMeshData.vertexVec, wheelMeshData.indexVec, device, deviceContext, wheelTexture.Get(), cb_vs_vertexshader);
@@ -23,7 +23,7 @@ bool Car::Initialize(ID3D11Device * device, ID3D11DeviceContext * deviceContext,
     wheels[2].SetPosition(-0.55f, -0.5f, -0.75f);
     wheels[3].SetPosition( 0.55f, -0.5f, -0.75f);
 
-    return false;
+    return true;
 }
 
 void Car::Draw(const XMMATRIX& viewProjectionMatrix)

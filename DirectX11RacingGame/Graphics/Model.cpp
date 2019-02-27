@@ -72,9 +72,7 @@ bool Model::LoadModel(const std::string & filePath)
 {
     Assimp::Importer importer;
 
-    const aiScene* pScene = importer.ReadFile(filePath,
-        aiProcess_Triangulate |
-        aiProcess_ConvertToLeftHanded);
+    const aiScene* pScene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
 
     if (pScene == nullptr)
         return false;
@@ -103,7 +101,7 @@ Mesh Model::ProcessMesh(aiMesh * mesh, const aiScene * scene)
     std::vector<Vertex> vertices;
     std::vector<DWORD> indices;
 
-    //Get vertices
+    // Get vertices
     for (UINT i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;

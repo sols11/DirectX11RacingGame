@@ -164,6 +164,11 @@ void Engine::Update()
             }
         }
     }
+    // 限制移动范围
+    if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+        this->graphics.camera.SetPosition(XMVectorClamp(this->graphics.camera.GetPositionVector(), XMVectorSet(-40, -1, -40, 0), XMVectorSet(40, 10, 40, 10)));
+    else
+        this->graphics.car.SetPosition(XMVectorClamp(this->graphics.car.GetPositionVector(), XMVectorSet(-40, -1, -40, 0), XMVectorSet(40, 5, 40, 10)));
     // 最后再更新相机
     this->graphics.camera.UpdateViewMatrix();
 }
