@@ -1,12 +1,12 @@
 #pragma once
+//#include <d3d11_1.h>
 #include <DirectXMath.h>
 
 struct Vertex
 {
-    Vertex() {}
-    Vertex(float x, float y, float r, float g, float b)
-        : pos(x, y), color(r, g, b) {}
+	Vertex() {}
+	Vertex(float x, float y, float z, float u, float v) : position(x, y, z), texCoord(u, v) {}
 
-    DirectX::XMFLOAT2 pos;
-    DirectX::XMFLOAT3 color;
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT2 texCoord;
 };

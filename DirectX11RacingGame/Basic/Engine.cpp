@@ -1,21 +1,23 @@
 #include "Engine.h"
 
-bool Engine::Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class, int width, int height)
+bool Engine::Initialize(HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height)
 {
-    if (!this->render_window.Initialize(this, hInstance, window_title, window_class, width, height))
+    timer.Start();
+
+    if (!WindowContent::Initialize(this, hInstance, windowTitle, windowClass, width, height))
         return false;
 
-    if (!this->graphics.Initialize(this->render_window.GetHWND(), width, height))
+    if (!this->graphics.Initialize(this->WindowContent::GetHWND(), width, height))
         return false;
-}
 
-bool Engine::ProcessMessages()
-{
-    return this->render_window.ProcessMessages();
+    return true;
 }
 
 void Engine::Update()
 {
+    float deltaTime = timer.GetElapsedTime();
+    timer.Restart();
+
     while (!keyboard.CharBufferIsEmpty())
     {
         unsigned char ch = keyboard.ReadChar();
@@ -42,6 +44,133 @@ void Engine::Update()
         outmsg += "\n";
         OutputDebugStringA(outmsg.c_str());
     }
+
+    if (keyboard.KeyIsPressed('1') && this->graphics.camera.mode != Camera::Mode::FirstPerson)
+    {
+        this->graphics.camera.mode = Camera::Mode::FirstPerson;
+        this->graphics.camera.SetPosition(this->graphics.car.GetPositionVector());
+        this->graphics.camera.SetRotation(this->graphics.car.GetRotationVector());
+        this->graphics.car.dontDraw = true;
+    }
+    else if (keyboard.KeyIsPressed('2') && this->graphics.camera.mode != Camera::Mode::ThirdPerson)
+    {
+        this->graphics.camera.mode = Camera::Mode::ThirdPerson;
+        this->graphics.car.SetPosition(this->graphics.camera.GetPositionVector());
+        this->graphics.camera.SetRotation(1.0f, -XM_PIDIV2, 0.0f);
+        this->graphics.car.dontDraw = false;
+    }
+
+    while (!mouse.EventBufferIsEmpty())
+    {
+        MouseEvent mouseEvent = mouse.ReadEvent();
+        if (mouse.IsRightDown())
+        {
+            if (mouseEvent.GetType() == MouseEvent::EventType::RAW_MOVE)
+            {
+                // 自由旋转
+                if (this->graphics.camera.mode == Camera::Mode::Free)
+                {
+                    this->graphics.camera.AdjustRotation((float)mouseEvent.GetPosY() * 0.01f, (float)mouseEvent.GetPosX() * 0.01f, 0);
+                }
+                // 绕物体旋转
+                else if (this->graphics.camera.mode == Camera::Mode::ThirdPerson)
+                {
+                    this->graphics.camera.RotateX((float)mouseEvent.GetPosY() * deltaTime * 0.01f);
+                    this->graphics.camera.RotateY((float)mouseEvent.GetPosX() * deltaTime * 0.01f);
+                }
+            }
+        }
+    }
+
+    // 自由移动相机
+    if (this->graphics.camera.mode == Camera::Mode::Free)
+    {
+        if (keyboard.KeyIsPressed('W'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('S'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('A'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * -cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed('D'))
+        {
+            this->graphics.camera.AdjustPosition(this->graphics.camera.GetRightVector() * cameraSpeed * deltaTime);
+        }
+        if (keyboard.KeyIsPressed(VK_SPACE))
+        {
+            this->graphics.camera.AdjustPosition(0.0f, cameraSpeed * deltaTime, 0.0f);
+        }
+        if (keyboard.KeyIsPressed('X'))
+        {
+            this->graphics.camera.AdjustPosition(0.0f, -cameraSpeed * deltaTime, 0.0f);
+        }
+    }
+    // 控制汽车移动
+    else
+    {
+        if (keyboard.KeyIsPressed('W')) // ↑
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * carSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(deltaTime);    // 要在car调用AdjustPosition之前调用
+                this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * carSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('S')) // ↓
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustPosition(this->graphics.camera.GetForwardVector() * -carSpeed * deltaTime);
+            }
+            else
+            {
+                this->graphics.car.WheelRoll(-deltaTime);
+                this->graphics.car.AdjustPosition(this->graphics.car.GetForwardVector() * -carSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('A')) // ←
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustRotation(this->graphics.camera.GetUpVector() * -carRotSpeed * deltaTime);
+            }
+            else
+            {
+                if(!keyboard.KeyIsPressed('S')) // 倒退时不干扰旋转
+                    this->graphics.car.WheelRoll(deltaTime);
+                this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * -carRotSpeed * deltaTime);
+            }
+        }
+        if (keyboard.KeyIsPressed('D')) // →
+        {
+            if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+            {
+                this->graphics.camera.AdjustRotation(this->graphics.camera.GetUpVector() * carRotSpeed * deltaTime);
+            }
+            else
+            {
+                if (!keyboard.KeyIsPressed('S'))
+                    this->graphics.car.WheelRoll(deltaTime);
+                this->graphics.car.AdjustRotation(this->graphics.car.GetUpVector() * carRotSpeed * deltaTime);
+            }
+        }
+    }
+    // 限制移动范围
+    if (this->graphics.camera.mode == Camera::Mode::FirstPerson)
+        this->graphics.camera.SetPosition(XMVectorClamp(this->graphics.camera.GetPositionVector(), XMVectorSet(-40, -1, -40, 0), XMVectorSet(40, 10, 40, 10)));
+    else
+        this->graphics.car.SetPosition(XMVectorClamp(this->graphics.car.GetPositionVector(), XMVectorSet(-40, -1, -40, 0), XMVectorSet(40, 5, 40, 10)));
+    // 最后再更新相机
+    this->graphics.camera.UpdateViewMatrix();
 }
 
 void Engine::RenderFrame()
