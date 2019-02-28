@@ -141,7 +141,7 @@ bool Graphics::InitializeDirectX(HWND hwnd)
 bool Graphics::InitializeShaders()
 {
 
-    std::wstring shaderfolder = L"";
+    std::wstring shaderfolder = L"..\\x64\\Release\\";
 #pragma region DetermineShaderPath
     if (IsDebuggerPresent() == TRUE)
     {
