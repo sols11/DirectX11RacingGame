@@ -245,7 +245,7 @@ void Graphics::RenderFrame()
     // 按键切换视角: 1-第一人称 2-第三人称 \nW/S/A/D 前进/后退/左转/右转 \n第三人称下鼠标右键移动控制视野\n
     static std::wstring text = L"Input: 1-FirstPerson 2-ThirdPeron \nW/S/A/D Move \nRight mouse button motion control vision\n";
     fpsCounter += 1;
-    if (fpsTimer.GetMilisecondsElapsed() > 1000.0)
+    if (fpsTimer.GetElapsedTime() > 1000.0)
     {
         fpsString = "FPS: " + std::to_string(fpsCounter);
         fpsCounter = 0;

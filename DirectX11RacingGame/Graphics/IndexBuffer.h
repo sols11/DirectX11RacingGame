@@ -36,7 +36,7 @@ public:
             buffer.Reset();
 
         this->indexCount = indexCount;
-        //Load Index Data
+        // Load Index Data
         D3D11_BUFFER_DESC indexBufferDesc;
         ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
         indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;

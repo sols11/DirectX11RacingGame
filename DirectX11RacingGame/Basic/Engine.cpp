@@ -15,7 +15,7 @@ bool Engine::Initialize(HINSTANCE hInstance, std::string windowTitle, std::strin
 
 void Engine::Update()
 {
-    float deltaTime = timer.GetMilisecondsElapsed();
+    float deltaTime = timer.GetElapsedTime();
     timer.Restart();
 
     while (!keyboard.CharBufferIsEmpty())
